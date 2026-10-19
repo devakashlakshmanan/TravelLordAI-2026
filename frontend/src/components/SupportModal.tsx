@@ -1,23 +1,39 @@
 import React, { useState } from 'react';
-import { HelpCircle, X, Mail, AlertTriangle, FileText, Send, CheckCircle2 } from 'lucide-react';
+import { HelpCircle, X, Mail, AlertTriangle, FileText, Send, CheckCircle2, AlertCircle } from 'lucide-react';
+import { api } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 export const SupportModal: React.FC = () => {
+  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [ticketSubject, setTicketSubject] = useState('');
   const [ticketMessage, setTicketMessage] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+  const [submittedRef, setSubmittedRef] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!ticketSubject || !ticketMessage) return;
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await api.submitSupportTicket({
+        subject: ticketSubject,
+        description: ticketMessage,
+        email: user?.email,
+      });
+      setSubmittedRef(res.ticket_reference);
       setTicketSubject('');
       setTicketMessage('');
-      setIsOpen(false);
-    }, 2500);
+    } catch (err: any) {
+      setError(err.message || 'Failed to submit ticket. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
+
 
   return (
     <>
@@ -79,7 +95,7 @@ export const SupportModal: React.FC = () => {
                 <details className="bg-slate-50 p-2.5 rounded-lg border border-slate-200 cursor-pointer">
                   <summary className="font-semibold text-slate-800">Is an account mandatory?</summary>
                   <p className="mt-1 text-slateText leading-normal">
-                    No. The India Threat Map, route risk analyzer, and official alerts are completely open to explore without registration.
+                    Public visitors can view the landing page, marketing overview, and official source transparency. Operational platform features—including Journey Planning, the complete Threat Centre radar, Citizen Reporting, and the AI Assistant—require a signed-in account to ensure data integrity and personalized corridor safety.
                   </p>
                 </details>
               </div>
@@ -88,10 +104,29 @@ export const SupportModal: React.FC = () => {
               <div className="pt-2 border-t border-slate-200">
                 <h4 className="font-heading font-bold text-sm text-navy-900 mb-2">Submit an Inquiry or Data Correction</h4>
 
-                {submitted ? (
-                  <div className="p-4 bg-emerald-50 text-emerald-900 border border-emerald-300 rounded-xl flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                    <span>Inquiry submitted successfully. A ticket ID has been generated for review.</span>
+                {error && (
+                  <div className="p-3 mb-3 bg-red-50 text-red-900 border border-red-200 rounded-xl flex items-start gap-2 text-xs">
+                    <AlertCircle className="w-4 h-4 text-alertRed flex-shrink-0 mt-0.5" />
+                    <span>{error}</span>
+                  </div>
+                )}
+
+                {submittedRef ? (
+                  <div className="p-4 bg-emerald-50 text-emerald-950 border border-emerald-300 rounded-xl space-y-2">
+                    <div className="flex items-center gap-2 font-bold text-emerald-800">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                      <span>Inquiry Logged Successfully</span>
+                    </div>
+                    <p className="text-xs text-slate-700 leading-relaxed">
+                      Your inquiry has been recorded under tracking reference <strong className="font-mono text-navy-900">{submittedRef}</strong>. The moderation desk reviews active corridors periodically.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setSubmittedRef(null)}
+                      className="mt-2 text-xs font-bold text-teal hover:underline"
+                    >
+                      Submit another inquiry
+                    </button>
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-3">
@@ -119,10 +154,17 @@ export const SupportModal: React.FC = () => {
                     </div>
                     <button
                       type="submit"
-                      className="w-full py-2 bg-teal hover:bg-teal-dark text-white font-semibold rounded-lg shadow-sm flex items-center justify-center gap-1.5 transition-colors"
+                      disabled={loading}
+                      className="w-full py-2 bg-teal hover:bg-teal-dark disabled:opacity-75 text-white font-semibold rounded-lg shadow-sm flex items-center justify-center gap-1.5 transition-colors"
                     >
-                      <Send className="w-4 h-4" />
-                      Submit Ticket
+                      {loading ? (
+                        <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4" />
+                          <span>Submit Ticket</span>
+                        </>
+                      )}
                     </button>
                   </form>
                 )}

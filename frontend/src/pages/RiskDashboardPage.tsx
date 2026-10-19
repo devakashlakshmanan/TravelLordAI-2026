@@ -32,35 +32,34 @@ export const RiskDashboardPage: React.FC = () => {
         const incList = await api.getIncidents({ include_sample: true });
         setIncidents(incList);
 
-        // Fetch saved route or re-simulate if fresh analysis
-        // If analysisId is provided, fetch route data
+        // Fetch stored analysis using real backend analysis endpoint
         if (analysisId) {
           try {
-            const routeData = await api.getRouteById(analysisId);
-            if (routeData && routeData.geometry) {
-              const res = await api.analyzeRoute({
-                origin_label: routeData.origin_label,
-                origin_lat: routeData.origin_lat,
-                origin_lon: routeData.origin_lon,
-                destination_label: routeData.destination_label,
-                destination_lat: routeData.destination_lat,
-                destination_lon: routeData.destination_lon,
-              });
-              setAnalysis(res);
+            const stored = await api.getAnalysisById(analysisId);
+            setAnalysis(stored);
+          } catch (analysisErr) {
+            // Fallback: Check if analysisId is a saved Route ID
+            try {
+              const routeData = await api.getRouteById(analysisId);
+              if (routeData && routeData.origin_lat) {
+                const res = await api.analyzeRoute({
+                  origin_label: routeData.origin_label,
+                  origin_lat: routeData.origin_lat,
+                  origin_lon: routeData.origin_lon,
+                  destination_label: routeData.destination_label,
+                  destination_lat: routeData.destination_lat,
+                  destination_lon: routeData.destination_lon,
+                });
+                setAnalysis(res);
+              } else {
+                setError('Route record found but corridor parameters are incomplete.');
+              }
+            } catch {
+              setError('Unable to load this route analysis. The record may not exist or belongs to another user.');
             }
-          } catch {
-            // Default demo route if analysisId is standalone UUID
-            const res = await api.analyzeRoute({
-              origin_label: 'New Delhi, Delhi, India',
-              origin_lat: 28.6139,
-              origin_lon: 77.2090,
-              destination_label: 'Manali, Himachal Pradesh, India',
-              destination_lat: 32.2396,
-              destination_lon: 77.1887,
-            });
-            setAnalysis(res);
           }
         }
+
       } catch (err: any) {
         setError(err.message || 'Failed to load risk analysis.');
       } finally {

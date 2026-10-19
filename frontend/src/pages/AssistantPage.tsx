@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Bot, Send, Sparkles, AlertTriangle, ShieldCheck, Clock,
-  ExternalLink, HelpCircle, FileText, ChevronRight, RefreshCw, AlertCircle
+  ExternalLink, HelpCircle, FileText, ChevronRight, RefreshCw, AlertCircle, Trash2
 } from 'lucide-react';
 import { api } from '../services/api';
-import { AssistantResponse, EvidenceCitation } from '../types';
+import { AssistantResponse, EvidenceCitation, ChatMessageItem } from '../types';
 import { Link } from 'react-router-dom';
 
 const SUGGESTED_QUERIES = [
-  "Are there any reported landslides or rockfalls along mountain routes?",
-  "What weather alerts are active along the NH-3 Kiratpur-Manali highway corridor?",
-  "Are there active elephant crossing zones or night travel bans in Bandipur?",
-  "Which highway corridors currently have reported farmer or civil gatherings?",
-  "Is the route from Delhi to Shimla verified 100% safe to travel right now?"
+  "What weather alerts are active along the Konkan Coast (NH-66) or Western Ghats?",
+  "Are there reported landslides along Uttarakhand or Himachal mountain corridors?",
+  "Are there active elephant crossing zones or night travel bans in Bandipur (NH-766)?",
+  "What flood warnings has CWC issued along the Brahmaputra (Assam) or Godavari basins?",
+  "Is the highway corridor from Mumbai to Pune or Delhi to Jaipur verified 100% safe right now?"
 ];
 
 interface ChatMessage {
@@ -21,6 +21,7 @@ interface ChatMessage {
   text: string;
   citations?: EvidenceCitation[];
   freshness?: string;
+  provider?: string;
   isDisclaimer?: boolean;
 }
 
@@ -34,6 +35,25 @@ export const AssistantPage: React.FC = () => {
     },
   ]);
   const [loading, setLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, loading]);
+
+  const handleClearChat = () => {
+    setMessages([
+      {
+        id: 'welcome',
+        sender: 'assistant',
+        text: "Chat cleared. Ask any question regarding hazard exposure, active road conditions, or travel advisories across India.",
+      },
+    ]);
+  };
 
   const handleSend = async (queryToSend?: string) => {
     const q = queryToSend || inputQuery;
@@ -49,8 +69,17 @@ export const AssistantPage: React.FC = () => {
     setInputQuery('');
     setLoading(true);
 
+    // Format chat history for multi-turn RAG context
+    const historyPayload: ChatMessageItem[] = messages
+      .filter((m) => m.id !== 'welcome')
+      .slice(-6)
+      .map((m) => ({
+        role: m.sender,
+        content: m.text,
+      }));
+
     try {
-      const res: AssistantResponse = await api.queryAssistant(q);
+      const res: AssistantResponse = await api.queryAssistant(q, undefined, historyPayload);
 
       const assistantMsg: ChatMessage = {
         id: String(Date.now() + 1),
@@ -58,6 +87,7 @@ export const AssistantPage: React.FC = () => {
         text: res.answer,
         citations: res.evidence_citations,
         freshness: res.data_freshness_status,
+        provider: res.provider,
       };
 
       setMessages((prev) => [...prev, assistantMsg]);
@@ -111,6 +141,23 @@ export const AssistantPage: React.FC = () => {
 
       {/* Chat Display Box */}
       <div className="bg-white rounded-2xl shadow-card border border-slate-200 overflow-hidden flex flex-col h-[550px]">
+        {/* Chat Box Top Toolbar */}
+        <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs text-slate-500">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="font-semibold text-navy-900">Platform Evidence + Groq AI Engine</span>
+          </div>
+          <button
+            type="button"
+            onClick={handleClearChat}
+            className="flex items-center gap-1 text-[11px] font-semibold text-slate-500 hover:text-rose-600 transition-colors"
+            title="Reset conversation"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>Clear Chat</span>
+          </button>
+        </div>
+
         {/* Messages Scroll Area */}
         <div className="flex-1 p-5 overflow-y-auto space-y-5">
           {messages.map((msg) => (
@@ -165,6 +212,12 @@ export const AssistantPage: React.FC = () => {
                     </div>
                   </div>
                 )}
+
+                {msg.provider && (
+                  <div className="mt-2 text-[10px] text-slate-400 font-mono">
+                    Provider: {msg.provider}
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -180,6 +233,7 @@ export const AssistantPage: React.FC = () => {
               </div>
             </div>
           )}
+          <div ref={messagesEndRef} />
         </div>
 
         {/* Input Bar */}

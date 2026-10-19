@@ -10,7 +10,10 @@ from backend.app.schemas.dto import (
     RouteCalculateRequest,
     RouteSaveRequest,
     RouteAnalysisResponse,
-    GeocodeItem
+    GeocodeItem,
+    SegmentRiskDTO,
+    IncidentReference,
+    AlternativeRouteDTO
 )
 from backend.app.integrations.nominatim_adapter import nominatim_client
 from backend.app.integrations.osrm_adapter import osrm_client
@@ -25,8 +28,22 @@ async def geocode_location(q: str = Query(..., min_length=2)):
     results = await nominatim_client.search(q)
     return [GeocodeItem(**item) for item in results]
 
+@router.get("/reverse-geocode", response_model=Optional[GeocodeItem])
+async def reverse_geocode_location(
+    lat: float = Query(..., ge=-90.0, le=90.0),
+    lon: float = Query(..., ge=-180.0, le=180.0)
+):
+    """Reverse geocode coordinates to location name in India."""
+    res = await nominatim_client.reverse_geocode(lat, lon)
+    if res:
+        return GeocodeItem(**res)
+    return None
+
 @router.post("/calculate")
-async def calculate_route(req: RouteCalculateRequest):
+async def calculate_route(
+    req: RouteCalculateRequest,
+    current_user: User = Depends(get_current_user)
+):
     """
     Calculate driving corridor polyline and alternatives connecting origin and destination.
     """
@@ -40,7 +57,7 @@ async def calculate_route(req: RouteCalculateRequest):
 @router.post("/analyze", response_model=RouteAnalysisResponse)
 async def analyze_route_hazards(
     req: RouteCalculateRequest,
-    current_user: Optional[User] = Depends(get_current_user_optional),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -77,7 +94,7 @@ async def analyze_route_hazards(
 
     # 4. Persist Route and Analysis to database
     route_record = Route(
-        user_id=current_user.id if current_user else None,
+        user_id=current_user.id,
         title=f"{req.origin_label.split(',')[0]} to {req.destination_label.split(',')[0]}",
         origin_label=req.origin_label,
         origin_lat=req.origin_lat,
@@ -96,7 +113,7 @@ async def analyze_route_hazards(
 
     analysis_record = RouteAnalysis(
         route_id=route_record.id,
-        user_id=current_user.id if current_user else None,
+        user_id=current_user.id,
         route_provider=route_data.get("provider", "osrm"),
         overall_risk_index=analysis_result["overall_risk_index"],
         overall_risk_level=analysis_result["overall_risk_level"],
@@ -144,6 +161,110 @@ async def analyze_route_hazards(
         geometry=polyline,
         is_safe_claim=False
     )
+
+@router.get("/analyses/{analysis_id}", response_model=RouteAnalysisResponse)
+async def get_route_analysis_by_id(
+    analysis_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Retrieve stored route risk analysis with full segment evaluations,
+    provenance, and uncertainty metrics.
+    """
+    res = await db.execute(
+        select(RouteAnalysis)
+        .options(
+            selectinload(RouteAnalysis.segments),
+            selectinload(RouteAnalysis.route)
+        )
+        .where(RouteAnalysis.id == analysis_id)
+    )
+    analysis = res.scalars().first()
+
+    # If not found directly by analysis_id, check if route_id was passed
+    if not analysis:
+        r_res = await db.execute(
+            select(Route)
+            .options(
+                selectinload(Route.analyses).selectinload(RouteAnalysis.segments)
+            )
+            .where(Route.id == analysis_id)
+        )
+        route_obj = r_res.scalars().first()
+        if route_obj and route_obj.analyses:
+            analysis = route_obj.analyses[-1]
+            analysis.route = route_obj
+
+    if not analysis:
+        raise HTTPException(status_code=404, detail="Route analysis record not found.")
+
+    # Authorization
+    owner_id = analysis.user_id or (analysis.route.user_id if analysis.route else None)
+    if owner_id and owner_id != current_user.id and current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Unauthorized access to this route analysis.")
+
+    segments_dto: List[SegmentRiskDTO] = []
+    all_intersecting_refs: List[IncidentReference] = []
+    seen_ref_ids = set()
+
+    sorted_segs = sorted(analysis.segments, key=lambda s: s.segment_index) if analysis.segments else []
+    for s in sorted_segs:
+        threats_list: List[IncidentReference] = []
+        for t_dict in (s.threat_references or []):
+            try:
+                ref = IncidentReference(**t_dict)
+                threats_list.append(ref)
+                if ref.id not in seen_ref_ids:
+                    seen_ref_ids.add(ref.id)
+                    all_intersecting_refs.append(ref)
+            except Exception:
+                continue
+
+        segments_dto.append(SegmentRiskDTO(
+            segment_index=s.segment_index,
+            start_lat=s.start_lat,
+            start_lon=s.start_lon,
+            end_lat=s.end_lat,
+            end_lon=s.end_lon,
+            risk_index=s.segment_risk_index,
+            risk_level=s.segment_risk_level,
+            evidence_quality=s.evidence_quality,
+            threats=threats_list
+        ))
+
+    alternatives_dto: List[AlternativeRouteDTO] = []
+    for alt in (analysis.alternatives or []):
+        try:
+            alternatives_dto.append(AlternativeRouteDTO(**alt))
+        except Exception:
+            continue
+
+    route_geom = analysis.route.geometry if (analysis.route and analysis.route.geometry) else []
+    origin_lbl = analysis.route.origin_label if analysis.route else "Origin"
+    dest_lbl = analysis.route.destination_label if analysis.route else "Destination"
+    dist_m = analysis.route.distance_meters if analysis.route else 0.0
+    dur_s = analysis.route.duration_seconds if analysis.route else 0.0
+
+    return RouteAnalysisResponse(
+        analysis_id=analysis.id,
+        route_id=analysis.route_id,
+        origin_label=origin_lbl,
+        destination_label=dest_lbl,
+        distance_meters=dist_m,
+        duration_seconds=dur_s,
+        overall_risk_index=analysis.overall_risk_index,
+        overall_risk_level=analysis.overall_risk_level,
+        evidence_coverage=analysis.evidence_coverage,
+        uncertainty_summary=analysis.uncertainty_summary,
+        contributing_reasons=analysis.contributing_reasons or [],
+        segments=segments_dto,
+        intersecting_incidents=all_intersecting_refs,
+        alternatives=alternatives_dto,
+        geometry=route_geom,
+        is_safe_claim=False
+    )
+
 
 @router.get("")
 async def list_user_saved_routes(
@@ -201,7 +322,7 @@ async def save_route(
 @router.get("/{id}")
 async def get_route_details(
     id: str,
-    current_user: Optional[User] = Depends(get_current_user_optional),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """Fetch route and its associated risk analyses."""
@@ -215,7 +336,7 @@ async def get_route_details(
         raise HTTPException(status_code=404, detail="Route not found")
 
     # If route has a private owner, ensure authorization
-    if route.user_id and (not current_user or current_user.id != route.user_id):
+    if route.user_id and (current_user.id != route.user_id and current_user.role != "admin"):
         raise HTTPException(status_code=403, detail="Unauthorized access to saved route")
 
     analyses_data = [

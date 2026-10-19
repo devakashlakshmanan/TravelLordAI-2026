@@ -9,11 +9,18 @@ TravelLord AI is an evidence-driven, multi-threat travel intelligence and risk-a
 
 ## 🌟 Core Innovations
 
-1. **Multi-Threat Risk Fusion**: Real-time integration of meteorological alerts (IMD), disaster bulletins (NDMA), geotechnical landslide susceptibility (GSI), wildlife crossing corridors, road infrastructure damage, and civic blockades.
-2. **Corridor Buffer Geospatial Analysis**: Maps journeys into discrete corridor slices, evaluating proximity, terrain vulnerability, and temporal overlap.
-3. **Evidence-Grounded Intelligence**: Every risk metric is traceable to raw observations, official warnings, or corroborated citizen reports. The system explicitly discloses data freshness and uncertainty.
-4. **Transparent "Zero-Incident" Policy**: The absence of reported alerts along a route is never portrayed as "verified safe."
-5. **Alternative Route Trade-off Comparison**: Compares primary and alternative routes by distance, travel time, and threat exposure score.
+1. **Nationwide Geographic Coverage**: Full route planning, geocoding, and threat exploration across all 28 Indian States, 8 Union Territories, national highways, and mountain corridors.
+2. **Cohesive Travel Awareness Suite**: Reorganized into 4 dedicated navigation groups:
+   - **Journey**: Plan Journey, My Journeys, RoadWatch, Travel Pack.
+   - **Explore**: Discover, TravelWise, Hazard Guide.
+   - **Community**: Live Reports, Report an Issue, My Contributions.
+   - **Trust & Safety**: Official Alerts, Source Centre, Emergency Guide.
+3. **Multi-Threat Risk Fusion**: Real-time integration of meteorological alerts (IMD), hydrological river flood warnings (CWC), disaster bulletins (NDMA), geotechnical landslide susceptibility (GSI NLSM), wildlife corridors (Forest Departments with anti-poaching fuzzing), and road closures (NHAI & Traffic Police).
+4. **Corridor Buffer Geospatial Analysis**: Maps journeys into discrete corridor slices, evaluating proximity, terrain vulnerability, and temporal overlap.
+5. **Evidence-Grounded Intelligence**: Every risk metric is traceable to raw observations, official warnings, or corroborated citizen reports. The system explicitly discloses data freshness and uncertainty without speculative accident scores or AI danger claims.
+6. **Transparent "Zero-Incident" Policy**: The absence of reported alerts along a route is never portrayed as "verified safe."
+7. **Alternative Route Trade-off Comparison**: Compares primary and alternative routes by distance, travel time, and threat exposure score.
+8. **Coverage & Freshness Transparency Dossier**: Interactive dashboard exposing source health, refresh intervals, and geographic precision levels.
 
 ---
 
@@ -30,8 +37,10 @@ TravelLord AI is an evidence-driven, multi-threat travel intelligence and risk-a
   - PostGIS / Geodesic spatial corridor matching
   - JWT Authentication with secure HttpOnly cookies & RBAC
 - **Data & Ingestion Pipeline**:
-  - OpenStreetMap & OSRM routing engine
-  - IMD weather and NDMA disaster adapters
+  - OpenStreetMap & OSRM routing engine with alternative route generation
+  - Nominatim pan-India geocoder with coordinate parsing & reverse geocoding
+  - Independent adapters for IMD, CWC, GSI, Wildlife, and NHAI
+  - National ingestion pipeline (`/api/v1/sources/sync`)
   - Controlled community reporting & moderation lifecycle
 
 ---
@@ -95,7 +104,7 @@ The application will be live at `http://localhost:5173`.
 ├── frontend/                 # React + Vite + TypeScript Application
 │   ├── src/
 │   │   ├── components/      # Reusable UI & Map components
-│   │   ├── pages/           # All 11 application routes
+│   │   ├── pages/           # All 22 application routes (Journey, Explore, Community, Trust & Safety, Admin)
 │   │   ├── services/        # Typed API clients
 │   │   ├── types/           # Shared TypeScript interfaces
 │   │   ├── App.tsx          # React Router setup

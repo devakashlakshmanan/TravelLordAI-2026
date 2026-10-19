@@ -94,6 +94,8 @@ export interface Incident {
   is_sample_data: boolean;
   evidence_quality: string;
   fuzzed_coordinates: boolean;
+  location_name?: string;
+  state_province?: string;
 }
 
 export interface ThreatSummary {
@@ -109,15 +111,71 @@ export interface ThreatSummary {
 export interface CommunityReport {
   id: string;
   category: string;
+  title?: string;
   description: string;
   latitude: number;
   longitude: number;
   location_name?: string;
   observation_time: string;
   media_url?: string;
-  moderation_state: 'pending_review' | 'unverified' | 'corroborated' | 'officially_confirmed' | 'resolved' | 'rejected';
+  moderation_state: 'pending_review' | 'unverified' | 'corroborated' | 'officially_confirmed' | 'disputed' | 'resolved' | 'rejected' | 'expired';
+  moderation_notes?: string;
   rejection_reason?: string;
   created_at: string;
+  corroborations_count?: number;
+  disputes_count?: number;
+  incident_id?: string;
+}
+
+export interface DestinationItem {
+  id: string;
+  name: string;
+  state: string;
+  region: 'North' | 'South' | 'West' | 'East' | 'Northeast' | 'Central';
+  tag: string;
+  description: string;
+  connectivity: {
+    highway: string;
+    airport: string;
+    railway: string;
+  };
+  best_season: string;
+  tourism_url: string;
+  coordinates: [number, number]; // [lat, lon]
+  terrain_type: string;
+}
+
+export interface TravelWiseItem {
+  id: string;
+  region: string;
+  category: 'permit' | 'restriction' | 'eco_rule' | 'scam_alert';
+  title: string;
+  summary: string;
+  rules: string[];
+  official_links: { name: string; url: string }[];
+  caution_notes: string;
+}
+
+export interface HazardGuideItem {
+  id: string;
+  hazard_type: string;
+  title: string;
+  icon: string;
+  high_risk_corridors: string[];
+  signs_to_watch: string[];
+  precautions: string[];
+  emergency_actions: string[];
+  non_diagnosis_disclaimer: string;
+}
+
+export interface EmergencyContactItem {
+  id: string;
+  name: string;
+  number: string;
+  category: 'national' | 'highway' | 'medical' | 'disaster' | 'state';
+  description: string;
+  availability: string;
+  jurisdiction: string;
 }
 
 export interface EvidenceCitation {
@@ -130,12 +188,18 @@ export interface EvidenceCitation {
   relevance_reason: string;
 }
 
+export interface ChatMessageItem {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
 export interface AssistantResponse {
   answer: string;
   evidence_citations: EvidenceCitation[];
   data_freshness_status: string;
   confidence_level: string;
   is_synthesized_safety_guarantee: boolean;
+  provider?: string;
 }
 
 export interface NotificationItem {

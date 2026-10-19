@@ -30,8 +30,10 @@ class Settings(BaseSettings):
     ENABLE_LIVE_INTEGRATIONS: bool = True
     DATA_REFRESH_INTERVAL_MINUTES: int = 30
 
-    # AI Assistant
-    LLM_PROVIDER: str = "none"
+    # AI Assistant & Groq API Integration (Server-Side Only)
+    GROQ_API_KEY: str = ""
+    GROQ_MODEL: str = "openai/gpt-oss-120b"
+    LLM_PROVIDER: str = "groq"
     LLM_API_KEY: str = ""
     LLM_MODEL: str = ""
 

@@ -35,3 +35,9 @@ Thumbs.db
 data/uploads/
 logs/
 scratch/
+
+# Archives & Release Packages
+*.zip
+*.tar.gz
+release_package/
+

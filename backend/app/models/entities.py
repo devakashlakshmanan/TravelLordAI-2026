@@ -195,6 +195,7 @@ class CommunityReport(Base):
     id = Column(String(36), primary_key=True, default=generate_uuid)
     reporter_id = Column(String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     incident_id = Column(String(36), ForeignKey("incidents.id", ondelete="SET NULL"), nullable=True)
+    title = Column(String(200), nullable=True)
     category = Column(String(50), nullable=False)
     description = Column(Text, nullable=False)
     latitude = Column(Float, nullable=False)
@@ -202,14 +203,17 @@ class CommunityReport(Base):
     location_name = Column(String(255), nullable=True)
     observation_time = Column(DateTime(timezone=True), nullable=False)
     media_url = Column(String(255), nullable=True)
-    moderation_state = Column(String(30), default="pending_review", nullable=False)
-    # 'pending_review', 'unverified', 'corroborated', 'officially_confirmed', 'resolved', 'rejected'
+    moderation_state = Column(String(30), default="unverified", nullable=False)
+    # 'unverified', 'corroborated', 'officially_confirmed', 'disputed', 'resolved', 'expired', 'rejected'
     moderation_notes = Column(Text, nullable=True)
     rejection_reason = Column(String(100), nullable=True)
+    corroborator_ids = Column(JSON, default=list) # List of user IDs who corroborated this report
+    dispute_records = Column(JSON, default=list) # List of disputes: [{user_id, reason, notes, timestamp}]
     created_at = Column(DateTime(timezone=True), default=utc_now, nullable=False)
     updated_at = Column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
 
     reporter = relationship("User", back_populates="reports")
+    incident = relationship("Incident", foreign_keys=[incident_id])
 
 
 class Notification(Base):
@@ -239,3 +243,17 @@ class AdminAuditLog(Base):
     change_metadata = Column(JSON, default=dict)
     ip_address = Column(String(45), nullable=True)
     timestamp = Column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+
+class SupportTicket(Base):
+    __tablename__ = "support_tickets"
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    user_id = Column(String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    ticket_reference = Column(String(20), unique=True, nullable=False, index=True)
+    email = Column(String(255), nullable=True)
+    subject = Column(String(200), nullable=False)
+    description = Column(Text, nullable=False)
+    status = Column(String(20), default="open", nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utc_now, nullable=False)
+

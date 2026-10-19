@@ -11,8 +11,8 @@ import { RiskBadge } from '../components/RiskBadge';
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
-  const [origin, setOrigin] = useState('New Delhi, Delhi, India');
-  const [destination, setDestination] = useState('Manali, Himachal Pradesh, India');
+  const [origin, setOrigin] = useState('');
+  const [destination, setDestination] = useState('');
   const [recentIncidents, setRecentIncidents] = useState<Incident[]>([]);
   const [threatSummary, setThreatSummary] = useState<ThreatSummary | null>(null);
   const [loadingLive, setLoadingLive] = useState(true);
@@ -37,7 +37,10 @@ export const LandingPage: React.FC = () => {
 
   const handleHeroSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate(`/plan?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}`);
+    const query = new URLSearchParams();
+    if (origin.trim()) query.set('origin', origin.trim());
+    if (destination.trim()) query.set('destination', destination.trim());
+    navigate(`/plan${query.toString() ? '?' + query.toString() : ''}`);
   };
 
   return (
@@ -79,7 +82,7 @@ export const LandingPage: React.FC = () => {
                     type="text"
                     value={origin}
                     onChange={(e) => setOrigin(e.target.value)}
-                    placeholder="Enter departure city or highway..."
+                    placeholder="e.g. Mumbai, New Delhi, Bengaluru, Kochi..."
                     className="w-full bg-transparent text-sm font-semibold focus:outline-none text-navy-900 placeholder:text-slate-400"
                   />
                 </div>
@@ -95,7 +98,7 @@ export const LandingPage: React.FC = () => {
                     type="text"
                     value={destination}
                     onChange={(e) => setDestination(e.target.value)}
-                    placeholder="Enter destination location..."
+                    placeholder="e.g. Pune, Manali, Chennai, Munnar..."
                     className="w-full bg-transparent text-sm font-semibold focus:outline-none text-navy-900 placeholder:text-slate-400"
                   />
                 </div>

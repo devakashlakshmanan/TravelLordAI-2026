@@ -30,3 +30,14 @@ async def get_sources_status(db: AsyncSession = Depends(get_db)):
         }
         for s in sources
     ]
+
+@router.post("/sync")
+async def trigger_ingestion_sync(
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Trigger an on-demand synchronization cycle across national data providers (IMD, GSI, CWC, NHAI, Forest Dept).
+    """
+    from backend.app.services.ingestion_service import ingestion_pipeline
+    stats = await ingestion_pipeline.run_full_sync(db)
+    return stats

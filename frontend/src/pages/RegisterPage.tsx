@@ -1,17 +1,28 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Shield, Mail, Lock, User as UserIcon, ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const { user, loading: authLoading, register } = useAuth();
+
+  const redirectTarget = searchParams.get('redirect') || (location.state as any)?.from?.pathname || '/app';
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user && !authLoading) {
+      navigate(redirectTarget, { replace: true });
+    }
+  }, [user, authLoading, redirectTarget, navigate]);
 
   // Live password validation
   const hasMinLength = password.length >= 8;
@@ -36,13 +47,14 @@ export const RegisterPage: React.FC = () => {
 
     try {
       await register(name, email, password);
-      navigate('/app');
+      navigate(redirectTarget, { replace: true });
     } catch (err: any) {
       setError(err.message || 'Registration failed. Please check details or try another email.');
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-[85vh] flex items-center justify-center px-4 py-12">
@@ -168,7 +180,10 @@ export const RegisterPage: React.FC = () => {
 
         <div className="pt-4 border-t border-slate-200 text-center text-xs text-slateText">
           Already registered?{' '}
-          <Link to="/login" className="font-bold text-teal hover:underline">
+          <Link
+            to={`/login${redirectTarget !== '/app' ? `?redirect=${encodeURIComponent(redirectTarget)}` : ''}`}
+            className="font-bold text-teal hover:underline"
+          >
             Sign In here
           </Link>
         </div>

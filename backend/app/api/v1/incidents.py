@@ -14,22 +14,60 @@ async def list_incidents(
     category: Optional[str] = Query(None, description="Filter by hazard category"),
     severity: Optional[str] = Query(None, description="Filter by platform severity"),
     verification: Optional[str] = Query(None, description="Filter by verification status"),
+    state: Optional[str] = Query(None, description="Filter by State or Union Territory name"),
+    search: Optional[str] = Query(None, description="Keyword search across title and description"),
+    min_lat: Optional[float] = Query(None, ge=-90.0, le=90.0, description="Bounding box minimum latitude"),
+    max_lat: Optional[float] = Query(None, ge=-90.0, le=90.0, description="Bounding box maximum latitude"),
+    min_lon: Optional[float] = Query(None, ge=-180.0, le=180.0, description="Bounding box minimum longitude"),
+    max_lon: Optional[float] = Query(None, ge=-180.0, le=180.0, description="Bounding box maximum longitude"),
     include_sample: bool = Query(True, description="Include QA sample data with explicit badge"),
+    limit: int = Query(100, ge=1, le=500, description="Maximum number of incidents to return"),
     db: AsyncSession = Depends(get_db)
 ):
-    """Retrieve active travel hazards with filtering and spatial provenance."""
+    """
+    Retrieve active travel hazards with multi-attribute filtering,
+    spatial bounding-box (viewport) queries, and regional filters across India.
+    """
+    from sqlalchemy import or_
+
     stmt = select(Incident).where(Incident.status == "active")
 
-    if category:
+    if category and category != "all":
         stmt = stmt.where(Incident.hazard_category == category)
-    if severity:
+    if severity and severity != "all":
         stmt = stmt.where(Incident.platform_severity == severity)
-    if verification:
+    if verification and verification != "all":
         stmt = stmt.where(Incident.verification_status == verification)
     if not include_sample:
         stmt = stmt.where(Incident.is_sample_data == False)
 
-    stmt = stmt.order_by(Incident.published_time.desc())
+    # Viewport bounding box filtering
+    if min_lat is not None and max_lat is not None:
+        stmt = stmt.where(Incident.latitude >= min_lat, Incident.latitude <= max_lat)
+    if min_lon is not None and max_lon is not None:
+        stmt = stmt.where(Incident.longitude >= min_lon, Incident.longitude <= max_lon)
+
+    # State / Region text filter
+    if state and state.strip() and state != "all":
+        stmt = stmt.where(
+            or_(
+                Incident.title.ilike(f"%{state.strip()}%"),
+                Incident.description.ilike(f"%{state.strip()}%")
+            )
+        )
+
+    # Keyword search
+    if search and search.strip():
+        q = f"%{search.strip()}%"
+        stmt = stmt.where(
+            or_(
+                Incident.title.ilike(q),
+                Incident.description.ilike(q),
+                Incident.source_name.ilike(q)
+            )
+        )
+
+    stmt = stmt.order_by(Incident.published_time.desc()).limit(limit)
     res = await db.execute(stmt)
     incidents = res.scalars().all()
     return [IncidentDTO.model_validate(inc) for inc in incidents]

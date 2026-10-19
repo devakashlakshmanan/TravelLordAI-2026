@@ -21,14 +21,30 @@ from backend.app.api.v1.assistant import router as assistant_router
 from backend.app.api.v1.notifications import router as notifications_router
 from backend.app.api.v1.admin import router as admin_router
 from backend.app.api.v1.sources import router as sources_router
+from backend.app.api.v1.support import router as support_router
 
 logging.basicConfig(level=settings.LOG_LEVEL)
 logger = logging.getLogger("travellord")
 
 async def init_db_and_seed():
     """Create database tables and seed baseline sources, incidents, and bootstrap admin."""
+    def migrate_columns(connection):
+        cursor = connection.connection.cursor()
+        cursor.execute("PRAGMA table_info(community_reports)")
+        existing_cols = {row[1] for row in cursor.fetchall()}
+        if existing_cols:
+            if "title" not in existing_cols:
+                cursor.execute("ALTER TABLE community_reports ADD COLUMN title VARCHAR(200)")
+            if "incident_id" not in existing_cols:
+                cursor.execute("ALTER TABLE community_reports ADD COLUMN incident_id VARCHAR(36)")
+            if "corroborator_ids" not in existing_cols:
+                cursor.execute("ALTER TABLE community_reports ADD COLUMN corroborator_ids JSON DEFAULT '[]'")
+            if "dispute_records" not in existing_cols:
+                cursor.execute("ALTER TABLE community_reports ADD COLUMN dispute_records JSON DEFAULT '[]'")
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(migrate_columns)
 
     async with AsyncSessionLocal() as session:
         # 1. Seed Sources
@@ -154,3 +170,5 @@ app.include_router(assistant_router, prefix="/api/v1")
 app.include_router(notifications_router, prefix="/api/v1")
 app.include_router(admin_router, prefix="/api/v1")
 app.include_router(sources_router, prefix="/api/v1")
+app.include_router(support_router, prefix="/api/v1")
+

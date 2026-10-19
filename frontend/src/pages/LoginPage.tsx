@@ -1,16 +1,27 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Shield, Mail, Lock, ArrowRight, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const { user, loading: authLoading, login } = useAuth();
+
+  const redirectTarget = searchParams.get('redirect') || (location.state as any)?.from?.pathname || '/app';
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user && !authLoading) {
+      navigate(redirectTarget, { replace: true });
+    }
+  }, [user, authLoading, redirectTarget, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,13 +30,14 @@ export const LoginPage: React.FC = () => {
 
     try {
       await login(email, password);
-      navigate('/app');
+      navigate(redirectTarget, { replace: true });
     } catch (err: any) {
       setError(err.message || 'Invalid email or password. Please verify credentials.');
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
@@ -114,7 +126,10 @@ export const LoginPage: React.FC = () => {
 
         <div className="pt-4 border-t border-slate-200 text-center text-xs text-slateText">
           Don't have an account yet?{' '}
-          <Link to="/register" className="font-bold text-teal hover:underline">
+          <Link
+            to={`/register${redirectTarget !== '/app' ? `?redirect=${encodeURIComponent(redirectTarget)}` : ''}`}
+            className="font-bold text-teal hover:underline"
+          >
             Create an account
           </Link>
         </div>

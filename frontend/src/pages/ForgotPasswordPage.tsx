@@ -1,16 +1,29 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Shield, Mail, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Shield, Mail, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
+import { api } from '../services/api';
 
 export const ForgotPasswordPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
-    setSubmitted(true);
+    setLoading(true);
+    setError(null);
+    try {
+      await api.forgotPassword(email);
+      setSubmitted(true);
+    } catch (err: any) {
+      setError(err.message || 'Failed to submit recovery request.');
+    } finally {
+      setLoading(false);
+    }
   };
+
 
   return (
     <div className="min-h-[75vh] flex items-center justify-center px-4 py-12">

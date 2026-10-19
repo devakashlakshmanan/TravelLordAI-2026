@@ -57,11 +57,11 @@ class GeocodeItem(BaseModel):
 
 class RouteCalculateRequest(BaseModel):
     origin_label: str
-    origin_lat: float
-    origin_lon: float
+    origin_lat: float = Field(..., ge=-90.0, le=90.0)
+    origin_lon: float = Field(..., ge=-180.0, le=180.0)
     destination_label: str
-    destination_lat: float
-    destination_lon: float
+    destination_lat: float = Field(..., ge=-90.0, le=90.0)
+    destination_lon: float = Field(..., ge=-180.0, le=180.0)
     travel_mode: str = "driving"
     avoid_hazards: bool = True
 
@@ -163,16 +163,19 @@ class ThreatSummaryResponse(BaseModel):
 
 # ----------------- COMMUNITY REPORT SCHEMAS -----------------
 class CommunityReportCreate(BaseModel):
+    title: Optional[str] = Field(None, max_length=200)
     category: str
     description: str = Field(..., min_length=10, max_length=2000)
-    latitude: float
-    longitude: float
+    latitude: float = Field(..., ge=-90.0, le=90.0)
+    longitude: float = Field(..., ge=-180.0, le=180.0)
     location_name: Optional[str] = None
     observation_time: Optional[datetime] = None
     media_url: Optional[str] = None
 
 class CommunityReportDTO(BaseModel):
     id: str
+    incident_id: Optional[str] = None
+    title: Optional[str] = None
     category: str
     description: str
     latitude: float
@@ -181,13 +184,23 @@ class CommunityReportDTO(BaseModel):
     observation_time: datetime
     media_url: Optional[str] = None
     moderation_state: str
+    moderation_notes: Optional[str] = None
     rejection_reason: Optional[str] = None
+    corroborations_count: int = 0
+    disputes_count: int = 0
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
 
+class CorroborationRequest(BaseModel):
+    notes: Optional[str] = Field(None, max_length=500)
+
+class DisputeRequest(BaseModel):
+    reason: str = Field(..., min_length=5, max_length=200)
+    notes: Optional[str] = Field(None, max_length=500)
+
 class ModerationActionRequest(BaseModel):
-    action: str = Field(..., description="'approve', 'corroborate', 'reject', 'resolve'")
+    action: str = Field(..., description="'approve', 'corroborate', 'reject', 'resolve', 'dispute'")
     rejection_reason: Optional[str] = None
     moderation_notes: Optional[str] = None
 
@@ -202,11 +215,16 @@ class EvidenceCitation(BaseModel):
     verification: str
     relevance_reason: str
 
+class ChatMessageItem(BaseModel):
+    role: str = "user" # 'user' or 'assistant'
+    content: str = Field(..., max_length=2000)
+
 class AssistantQueryRequest(BaseModel):
-    query: str = Field(..., min_length=3, max_length=1000)
+    query: str = Field(..., min_length=1, max_length=1500)
     route_id: Optional[str] = None
     latitude: Optional[float] = None
     longitude: Optional[float] = None
+    history: Optional[List[ChatMessageItem]] = None
 
 class AssistantQueryResponse(BaseModel):
     answer: str
@@ -214,6 +232,7 @@ class AssistantQueryResponse(BaseModel):
     data_freshness_status: str
     confidence_level: str
     is_synthesized_safety_guarantee: bool = False # Always False
+    provider: Optional[str] = None # 'groq' or 'grounded_rag'
 
 
 # ----------------- NOTIFICATION SCHEMAS -----------------
@@ -227,3 +246,21 @@ class NotificationDTO(BaseModel):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+# ----------------- SUPPORT SCHEMAS -----------------
+class SupportTicketCreate(BaseModel):
+    subject: str = Field(..., min_length=3, max_length=200)
+    description: str = Field(..., min_length=10, max_length=3000)
+    email: Optional[str] = None
+
+class SupportTicketResponse(BaseModel):
+    id: str
+    ticket_reference: str
+    subject: str
+    status: str
+    message: str
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
