@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Navigation, Compass, Calendar, Clock, Car, Bike, AlertTriangle,
@@ -36,6 +36,32 @@ export const JourneyPlannerPage: React.FC = () => {
   const [originSuggestions, setOriginSuggestions] = useState<GeocodeItem[]>([]);
   const [destSuggestions, setDestSuggestions] = useState<GeocodeItem[]>([]);
   const [activeSuggestionField, setActiveSuggestionField] = useState<'origin' | 'dest' | null>(null);
+
+  const originRef = useRef<HTMLDivElement>(null);
+  const destRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (
+        originRef.current && !originRef.current.contains(target) &&
+        destRef.current && !destRef.current.contains(target)
+      ) {
+        setActiveSuggestionField(null);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setActiveSuggestionField(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   // State
   const [loading, setLoading] = useState(false);
@@ -325,7 +351,7 @@ export const JourneyPlannerPage: React.FC = () => {
         <div className="lg:col-span-5 bg-white p-6 rounded-2xl shadow-card border border-slate-200 space-y-5">
           <form onSubmit={handleAnalyze} className="space-y-4">
             {/* Origin */}
-            <div className="relative">
+            <div ref={originRef} className="relative">
               <div className="flex items-center justify-between mb-1">
                 <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
                   Origin (Starting Point)
@@ -387,7 +413,7 @@ export const JourneyPlannerPage: React.FC = () => {
             </div>
 
             {/* Destination */}
-            <div className="relative">
+            <div ref={destRef} className="relative">
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                 Destination
               </label>

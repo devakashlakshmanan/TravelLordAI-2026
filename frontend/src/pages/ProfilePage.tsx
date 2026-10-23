@@ -21,11 +21,13 @@ export const ProfilePage: React.FC = () => {
 
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     setSuccess(false);
+    setError(null);
 
     try {
       await api.updateMe({
@@ -43,8 +45,9 @@ export const ProfilePage: React.FC = () => {
       await refreshUser();
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      setError(err?.message || 'Failed to update preferences. Please try again.');
+      setTimeout(() => setError(null), 5000);
     } finally {
       setSaving(false);
     }
@@ -70,6 +73,13 @@ export const ProfilePage: React.FC = () => {
           <div className="p-3.5 bg-emerald-50 border border-emerald-300 rounded-xl flex items-center gap-2 text-xs text-emerald-900 animate-fade-in font-bold">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
             <span>Preferences saved successfully.</span>
+          </div>
+        )}
+
+        {error && (
+          <div className="p-3.5 bg-red-50 border border-red-300 rounded-xl flex items-center gap-2 text-xs text-red-900 animate-fade-in font-bold">
+            <Shield className="w-4 h-4 text-alertRed flex-shrink-0" />
+            <span>{error}</span>
           </div>
         )}
 

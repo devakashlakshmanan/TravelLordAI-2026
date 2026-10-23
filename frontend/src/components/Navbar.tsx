@@ -12,8 +12,11 @@ export const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  type NavDropdownId = 'journey' | 'explore' | 'community' | 'trust';
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [openDropdown, setOpenDropdown] = useState<'journey' | 'explore' | 'community' | 'trust' | null>(null);
+  const [openDropdown, setOpenDropdown] = useState<NavDropdownId | null>(null);
+  const [isClickLocked, setIsClickLocked] = useState(false);
   const [mobileSectionOpen, setMobileSectionOpen] = useState<{ [key: string]: boolean }>({
     journey: true,
     explore: false,
@@ -22,18 +25,76 @@ export const Navbar: React.FC = () => {
   });
 
   const navRef = useRef<HTMLDivElement>(null);
+  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const triggerRefs = useRef<{ [key in NavDropdownId]?: HTMLButtonElement | null }>({});
+
+  const clearCloseTimeout = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+  };
+
+  const handleTriggerClick = (name: NavDropdownId) => {
+    clearCloseTimeout();
+    if (openDropdown === name) {
+      setOpenDropdown(null);
+      setIsClickLocked(false);
+    } else {
+      setOpenDropdown(name);
+      setIsClickLocked(true);
+    }
+  };
+
+  const handleGroupMouseEnter = (name: NavDropdownId) => {
+    clearCloseTimeout();
+    // Do not override a dropdown that the user deliberately opened by clicking
+    if (isClickLocked) {
+      return;
+    }
+    setOpenDropdown(name);
+  };
+
+  const handleGroupMouseLeave = () => {
+    // If deliberately opened by click, mouse leave MUST NEVER close it
+    if (isClickLocked) {
+      return;
+    }
+    clearCloseTimeout();
+    closeTimeoutRef.current = setTimeout(() => {
+      setOpenDropdown(null);
+    }, 200);
+  };
+
+  const handleSubmenuMouseEnter = () => {
+    clearCloseTimeout();
+  };
+
+  const handleSubmenuLinkClick = () => {
+    clearCloseTimeout();
+    setOpenDropdown(null);
+    setIsClickLocked(false);
+  };
 
   // Close dropdown on outside click or Escape key
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (navRef.current && !navRef.current.contains(event.target as Node)) {
+        clearCloseTimeout();
         setOpenDropdown(null);
+        setIsClickLocked(false);
       }
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        setOpenDropdown(null);
+        if (openDropdown) {
+          const currentTrigger = triggerRefs.current[openDropdown];
+          clearCloseTimeout();
+          setOpenDropdown(null);
+          setIsClickLocked(false);
+          currentTrigger?.focus();
+        }
         setMobileMenuOpen(false);
       }
     };
@@ -41,14 +102,17 @@ export const Navbar: React.FC = () => {
     document.addEventListener('mousedown', handleClickOutside);
     document.addEventListener('keydown', handleKeyDown);
     return () => {
+      clearCloseTimeout();
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [openDropdown]);
 
   // Close menus on route change
   useEffect(() => {
+    clearCloseTimeout();
     setOpenDropdown(null);
+    setIsClickLocked(false);
     setMobileMenuOpen(false);
   }, [location.pathname, location.search]);
 
@@ -84,10 +148,6 @@ export const Navbar: React.FC = () => {
   const isAssistantActive = location.pathname === '/assistant';
   const isDashboardActive = location.pathname === '/app';
 
-  const toggleDropdown = (name: 'journey' | 'explore' | 'community' | 'trust') => {
-    setOpenDropdown((prev) => (prev === name ? null : name));
-  };
-
   const toggleMobileSection = (section: string) => {
     setMobileSectionOpen((prev) => ({
       ...prev,
@@ -96,19 +156,19 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs transition-all">
+    <header className="sticky top-0 z-[1020] bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
+        <div className="flex justify-between h-16 items-center gap-2">
           {/* Logo & Brand */}
-          <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="w-10 h-10 rounded-xl bg-navy-900 flex items-center justify-center text-mint group-hover:bg-teal transition-colors shadow-xs flex-shrink-0">
-              <Shield className="w-6 h-6 stroke-[2.2]" />
+          <Link to="/" className="flex items-center gap-2.5 group flex-shrink-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-navy-900 flex items-center justify-center text-mint group-hover:bg-teal transition-colors shadow-xs flex-shrink-0">
+              <Shield className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2]" />
             </div>
-            <div>
-              <span className="font-heading font-extrabold text-xl tracking-tight text-navy-900">
+            <div className="flex flex-col justify-center">
+              <span className="font-heading font-extrabold text-lg sm:text-xl tracking-tight text-navy-900 leading-tight">
                 TravelLord <span className="text-teal font-black">AI</span>
               </span>
-              <span className="hidden sm:block text-[10px] tracking-wider font-semibold text-slateText uppercase">
+              <span className="hidden sm:block text-[9px] xl:text-[10px] tracking-wider font-semibold text-slateText uppercase leading-none mt-0.5">
                 India Risk Intelligence
               </span>
             </div>
@@ -118,30 +178,41 @@ export const Navbar: React.FC = () => {
           {user ? (
             <nav
               ref={navRef}
-              className="hidden lg:flex items-center space-x-1"
+              className="hidden lg:flex items-center space-x-0.5 xl:space-x-1"
               aria-label="Platform navigation"
             >
               {/* 1. Journey Group Dropdown */}
               <div
                 className="relative"
-                onMouseEnter={() => setOpenDropdown('journey')}
-                onMouseLeave={() => setOpenDropdown(null)}
+                onMouseEnter={() => handleGroupMouseEnter('journey')}
+                onMouseLeave={handleGroupMouseLeave}
               >
                 <button
+                  ref={(el) => (triggerRefs.current['journey'] = el)}
+                  id="journey-nav-trigger"
                   type="button"
-                  onClick={() => toggleDropdown('journey')}
+                  onClick={() => handleTriggerClick('journey')}
                   aria-expanded={openDropdown === 'journey'}
                   aria-haspopup="true"
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-teal/30 ${
+                  aria-controls="journey-nav-menu"
+                  onKeyDown={(e) => {
+                    if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+                      if (openDropdown !== 'journey') {
+                        e.preventDefault();
+                        handleTriggerClick('journey');
+                      }
+                    }
+                  }}
+                  className={`px-2.5 py-2 xl:px-3 rounded-lg text-xs xl:text-sm font-medium transition-colors flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-teal/30 whitespace-nowrap ${
                     isJourneyActive
                       ? 'bg-teal/10 text-teal font-semibold'
                       : 'text-slateText hover:text-navy-900 hover:bg-slate-50'
                   }`}
                 >
-                  <Navigation className="w-4 h-4 text-teal" />
+                  <Navigation className="w-3.5 h-3.5 xl:w-4 xl:h-4 text-teal flex-shrink-0" />
                   <span>Journey</span>
                   <ChevronDown
-                    className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                    className={`w-3 h-3 xl:w-3.5 xl:h-3.5 transition-transform duration-200 ${
                       openDropdown === 'journey' ? 'rotate-180 text-teal' : 'text-slate-400'
                     }`}
                   />
@@ -149,76 +220,85 @@ export const Navbar: React.FC = () => {
 
                 {openDropdown === 'journey' && (
                   <div
-                    role="menu"
-                    className="absolute top-full left-0 mt-1 w-72 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50 animate-fade-in divide-y divide-slate-100"
+                    id="journey-nav-menu"
+                    aria-labelledby="journey-nav-trigger"
+                    onMouseEnter={handleSubmenuMouseEnter}
+                    onMouseLeave={handleGroupMouseLeave}
+                    className="absolute top-full left-0 pt-2 w-72 z-[1050] animate-fade-in focus:outline-none"
                   >
-                    <Link
-                      to="/plan"
-                      role="menuitem"
-                      onClick={() => setOpenDropdown(null)}
-                      className="flex items-start gap-3 px-4 py-3 hover:bg-teal/5 transition-colors group"
+                    <div
+                      role="menu"
+                      aria-orientation="vertical"
+                      className="bg-white rounded-2xl shadow-xl border border-slate-200 py-2 divide-y divide-slate-100 overflow-hidden"
                     >
-                      <div className="w-8 h-8 rounded-lg bg-teal/10 text-teal flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-teal group-hover:text-white transition-colors">
-                        <Navigation className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="font-bold text-xs text-navy-900">Plan Journey</div>
-                        <div className="text-[11px] text-slate-500 leading-snug">
-                          Multi-threat corridor risk analysis & alternatives
+                      <Link
+                        to="/plan"
+                        role="menuitem"
+                        onClick={handleSubmenuLinkClick}
+                        className="flex items-start gap-3 px-4 py-3 hover:bg-teal/5 transition-colors group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-teal/10 text-teal flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-teal group-hover:text-white transition-colors">
+                          <Navigation className="w-4 h-4" />
                         </div>
-                      </div>
-                    </Link>
+                        <div>
+                          <div className="font-bold text-xs text-navy-900">Plan Journey</div>
+                          <div className="text-[11px] text-slate-500 leading-snug">
+                            Multi-threat corridor risk analysis & alternatives
+                          </div>
+                        </div>
+                      </Link>
 
-                    <Link
-                      to="/my-trips"
-                      role="menuitem"
-                      onClick={() => setOpenDropdown(null)}
-                      className="flex items-start gap-3 px-4 py-3 hover:bg-teal/5 transition-colors group"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-teal group-hover:text-white transition-colors">
-                        <Bookmark className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="font-bold text-xs text-navy-900">My Journeys</div>
-                        <div className="text-[11px] text-slate-500 leading-snug">
-                          Saved travel corridors and re-assessment history
+                      <Link
+                        to="/my-trips"
+                        role="menuitem"
+                        onClick={handleSubmenuLinkClick}
+                        className="flex items-start gap-3 px-4 py-3 hover:bg-teal/5 transition-colors group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-teal group-hover:text-white transition-colors">
+                          <Bookmark className="w-4 h-4" />
                         </div>
-                      </div>
-                    </Link>
+                        <div>
+                          <div className="font-bold text-xs text-navy-900">My Journeys</div>
+                          <div className="text-[11px] text-slate-500 leading-snug">
+                            Saved travel corridors and re-assessment history
+                          </div>
+                        </div>
+                      </Link>
 
-                    <Link
-                      to="/roadwatch"
-                      role="menuitem"
-                      onClick={() => setOpenDropdown(null)}
-                      className="flex items-start gap-3 px-4 py-3 hover:bg-teal/5 transition-colors group"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-amber-600 group-hover:text-white transition-colors">
-                        <Construction className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="font-bold text-xs text-navy-900">RoadWatch</div>
-                        <div className="text-[11px] text-slate-500 leading-snug">
-                          Documented pass closures, ghat advisories & roadworks
+                      <Link
+                        to="/roadwatch"
+                        role="menuitem"
+                        onClick={handleSubmenuLinkClick}
+                        className="flex items-start gap-3 px-4 py-3 hover:bg-teal/5 transition-colors group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                          <Construction className="w-4 h-4" />
                         </div>
-                      </div>
-                    </Link>
+                        <div>
+                          <div className="font-bold text-xs text-navy-900">RoadWatch</div>
+                          <div className="text-[11px] text-slate-500 leading-snug">
+                            Documented pass closures, ghat advisories & roadworks
+                          </div>
+                        </div>
+                      </Link>
 
-                    <Link
-                      to="/travel-pack"
-                      role="menuitem"
-                      onClick={() => setOpenDropdown(null)}
-                      className="flex items-start gap-3 px-4 py-3 hover:bg-teal/5 transition-colors group"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                        <Printer className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="font-bold text-xs text-navy-900">Travel Pack</div>
-                        <div className="text-[11px] text-slate-500 leading-snug">
-                          Printable journey briefing, checklists & contacts
+                      <Link
+                        to="/travel-pack"
+                        role="menuitem"
+                        onClick={handleSubmenuLinkClick}
+                        className="flex items-start gap-3 px-4 py-3 hover:bg-teal/5 transition-colors group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                          <Printer className="w-4 h-4" />
                         </div>
-                      </div>
-                    </Link>
+                        <div>
+                          <div className="font-bold text-xs text-navy-900">Travel Pack</div>
+                          <div className="text-[11px] text-slate-500 leading-snug">
+                            Printable journey briefing, checklists & contacts
+                          </div>
+                        </div>
+                      </Link>
+                    </div>
                   </div>
                 )}
               </div>
@@ -226,24 +306,35 @@ export const Navbar: React.FC = () => {
               {/* 2. Explore Group Dropdown */}
               <div
                 className="relative"
-                onMouseEnter={() => setOpenDropdown('explore')}
-                onMouseLeave={() => setOpenDropdown(null)}
+                onMouseEnter={() => handleGroupMouseEnter('explore')}
+                onMouseLeave={handleGroupMouseLeave}
               >
                 <button
+                  ref={(el) => (triggerRefs.current['explore'] = el)}
+                  id="explore-nav-trigger"
                   type="button"
-                  onClick={() => toggleDropdown('explore')}
+                  onClick={() => handleTriggerClick('explore')}
                   aria-expanded={openDropdown === 'explore'}
                   aria-haspopup="true"
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-teal/30 ${
+                  aria-controls="explore-nav-menu"
+                  onKeyDown={(e) => {
+                    if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+                      if (openDropdown !== 'explore') {
+                        e.preventDefault();
+                        handleTriggerClick('explore');
+                      }
+                    }
+                  }}
+                  className={`px-2.5 py-2 xl:px-3 rounded-lg text-xs xl:text-sm font-medium transition-colors flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-teal/30 whitespace-nowrap ${
                     isExploreActive
                       ? 'bg-teal/10 text-teal font-semibold'
                       : 'text-slateText hover:text-navy-900 hover:bg-slate-50'
                   }`}
                 >
-                  <Compass className="w-4 h-4 text-teal" />
+                  <Compass className="w-3.5 h-3.5 xl:w-4 xl:h-4 text-teal flex-shrink-0" />
                   <span>Explore</span>
                   <ChevronDown
-                    className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                    className={`w-3 h-3 xl:w-3.5 xl:h-3.5 transition-transform duration-200 ${
                       openDropdown === 'explore' ? 'rotate-180 text-teal' : 'text-slate-400'
                     }`}
                   />
@@ -251,59 +342,68 @@ export const Navbar: React.FC = () => {
 
                 {openDropdown === 'explore' && (
                   <div
-                    role="menu"
-                    className="absolute top-full left-0 mt-1 w-72 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50 animate-fade-in divide-y divide-slate-100"
+                    id="explore-nav-menu"
+                    aria-labelledby="explore-nav-trigger"
+                    onMouseEnter={handleSubmenuMouseEnter}
+                    onMouseLeave={handleGroupMouseLeave}
+                    className="absolute top-full left-0 pt-2 w-72 z-[1050] animate-fade-in focus:outline-none"
                   >
-                    <Link
-                      to="/discover"
-                      role="menuitem"
-                      onClick={() => setOpenDropdown(null)}
-                      className="flex items-start gap-3 px-4 py-3 hover:bg-teal/5 transition-colors group"
+                    <div
+                      role="menu"
+                      aria-orientation="vertical"
+                      className="bg-white rounded-2xl shadow-xl border border-slate-200 py-2 divide-y divide-slate-100 overflow-hidden"
                     >
-                      <div className="w-8 h-8 rounded-lg bg-teal/10 text-teal flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-teal group-hover:text-white transition-colors">
-                        <Compass className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="font-bold text-xs text-navy-900">Discover</div>
-                        <div className="text-[11px] text-slate-500 leading-snug">
-                          Pan-India regions, connectivity & terrain explorer
+                      <Link
+                        to="/discover"
+                        role="menuitem"
+                        onClick={handleSubmenuLinkClick}
+                        className="flex items-start gap-3 px-4 py-3 hover:bg-teal/5 transition-colors group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-teal/10 text-teal flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-teal group-hover:text-white transition-colors">
+                          <Compass className="w-4 h-4" />
                         </div>
-                      </div>
-                    </Link>
+                        <div>
+                          <div className="font-bold text-xs text-navy-900">Discover</div>
+                          <div className="text-[11px] text-slate-500 leading-snug">
+                            Pan-India regions, connectivity & terrain explorer
+                          </div>
+                        </div>
+                      </Link>
 
-                    <Link
-                      to="/travelwise"
-                      role="menuitem"
-                      onClick={() => setOpenDropdown(null)}
-                      className="flex items-start gap-3 px-4 py-3 hover:bg-teal/5 transition-colors group"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                        <BookOpen className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="font-bold text-xs text-navy-900">TravelWise</div>
-                        <div className="text-[11px] text-slate-500 leading-snug">
-                          Inner line permits, night traffic curfews & eco-rules
+                      <Link
+                        to="/travelwise"
+                        role="menuitem"
+                        onClick={handleSubmenuLinkClick}
+                        className="flex items-start gap-3 px-4 py-3 hover:bg-teal/5 transition-colors group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                          <BookOpen className="w-4 h-4" />
                         </div>
-                      </div>
-                    </Link>
+                        <div>
+                          <div className="font-bold text-xs text-navy-900">TravelWise</div>
+                          <div className="text-[11px] text-slate-500 leading-snug">
+                            Inner line permits, night traffic curfews & eco-rules
+                          </div>
+                        </div>
+                      </Link>
 
-                    <Link
-                      to="/hazard-guide"
-                      role="menuitem"
-                      onClick={() => setOpenDropdown(null)}
-                      className="flex items-start gap-3 px-4 py-3 hover:bg-teal/5 transition-colors group"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-amber-600 group-hover:text-white transition-colors">
-                        <AlertTriangle className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="font-bold text-xs text-navy-900">Hazard Guide</div>
-                        <div className="text-[11px] text-slate-500 leading-snug">
-                          Action protocols for floods, landslides & fog
+                      <Link
+                        to="/hazard-guide"
+                        role="menuitem"
+                        onClick={handleSubmenuLinkClick}
+                        className="flex items-start gap-3 px-4 py-3 hover:bg-teal/5 transition-colors group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                          <AlertTriangle className="w-4 h-4" />
                         </div>
-                      </div>
-                    </Link>
+                        <div>
+                          <div className="font-bold text-xs text-navy-900">Hazard Guide</div>
+                          <div className="text-[11px] text-slate-500 leading-snug">
+                            Action protocols for floods, landslides & fog
+                          </div>
+                        </div>
+                      </Link>
+                    </div>
                   </div>
                 )}
               </div>
@@ -311,24 +411,35 @@ export const Navbar: React.FC = () => {
               {/* 3. Community Group Dropdown */}
               <div
                 className="relative"
-                onMouseEnter={() => setOpenDropdown('community')}
-                onMouseLeave={() => setOpenDropdown(null)}
+                onMouseEnter={() => handleGroupMouseEnter('community')}
+                onMouseLeave={handleGroupMouseLeave}
               >
                 <button
+                  ref={(el) => (triggerRefs.current['community'] = el)}
+                  id="community-nav-trigger"
                   type="button"
-                  onClick={() => toggleDropdown('community')}
+                  onClick={() => handleTriggerClick('community')}
                   aria-expanded={openDropdown === 'community'}
                   aria-haspopup="true"
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-teal/30 ${
+                  aria-controls="community-nav-menu"
+                  onKeyDown={(e) => {
+                    if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+                      if (openDropdown !== 'community') {
+                        e.preventDefault();
+                        handleTriggerClick('community');
+                      }
+                    }
+                  }}
+                  className={`px-2.5 py-2 xl:px-3 rounded-lg text-xs xl:text-sm font-medium transition-colors flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-teal/30 whitespace-nowrap ${
                     isCommunityActive
                       ? 'bg-teal/10 text-teal font-semibold'
                       : 'text-slateText hover:text-navy-900 hover:bg-slate-50'
                   }`}
                 >
-                  <Users className="w-4 h-4 text-teal" />
+                  <Users className="w-3.5 h-3.5 xl:w-4 xl:h-4 text-teal flex-shrink-0" />
                   <span>Community</span>
                   <ChevronDown
-                    className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                    className={`w-3 h-3 xl:w-3.5 xl:h-3.5 transition-transform duration-200 ${
                       openDropdown === 'community' ? 'rotate-180 text-teal' : 'text-slate-400'
                     }`}
                   />
@@ -336,59 +447,68 @@ export const Navbar: React.FC = () => {
 
                 {openDropdown === 'community' && (
                   <div
-                    role="menu"
-                    className="absolute top-full left-0 mt-1 w-72 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50 animate-fade-in divide-y divide-slate-100"
+                    id="community-nav-menu"
+                    aria-labelledby="community-nav-trigger"
+                    onMouseEnter={handleSubmenuMouseEnter}
+                    onMouseLeave={handleGroupMouseLeave}
+                    className="absolute top-full left-0 pt-2 w-72 z-[1050] animate-fade-in focus:outline-none"
                   >
-                    <Link
-                      to="/live-reports"
-                      role="menuitem"
-                      onClick={() => setOpenDropdown(null)}
-                      className="flex items-start gap-3 px-4 py-3 hover:bg-teal/5 transition-colors group"
+                    <div
+                      role="menu"
+                      aria-orientation="vertical"
+                      className="bg-white rounded-2xl shadow-xl border border-slate-200 py-2 divide-y divide-slate-100 overflow-hidden"
                     >
-                      <div className="w-8 h-8 rounded-lg bg-teal/10 text-teal flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-teal group-hover:text-white transition-colors">
-                        <Users className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="font-bold text-xs text-navy-900">Live Reports</div>
-                        <div className="text-[11px] text-slate-500 leading-snug">
-                          Shared citizen observations & corroboration map
+                      <Link
+                        to="/live-reports"
+                        role="menuitem"
+                        onClick={handleSubmenuLinkClick}
+                        className="flex items-start gap-3 px-4 py-3 hover:bg-teal/5 transition-colors group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-teal/10 text-teal flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-teal group-hover:text-white transition-colors">
+                          <Users className="w-4 h-4" />
                         </div>
-                      </div>
-                    </Link>
+                        <div>
+                          <div className="font-bold text-xs text-navy-900">Live Reports</div>
+                          <div className="text-[11px] text-slate-500 leading-snug">
+                            Shared citizen observations & corroboration map
+                          </div>
+                        </div>
+                      </Link>
 
-                    <Link
-                      to="/report"
-                      role="menuitem"
-                      onClick={() => setOpenDropdown(null)}
-                      className="flex items-start gap-3 px-4 py-3 hover:bg-teal/5 transition-colors group"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-teal group-hover:text-white transition-colors">
-                        <PlusCircle className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="font-bold text-xs text-navy-900">Report an Issue</div>
-                        <div className="text-[11px] text-slate-500 leading-snug">
-                          Submit crowdsourced road or terrain hazard
+                      <Link
+                        to="/report"
+                        role="menuitem"
+                        onClick={handleSubmenuLinkClick}
+                        className="flex items-start gap-3 px-4 py-3 hover:bg-teal/5 transition-colors group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-teal group-hover:text-white transition-colors">
+                          <PlusCircle className="w-4 h-4" />
                         </div>
-                      </div>
-                    </Link>
+                        <div>
+                          <div className="font-bold text-xs text-navy-900">Report an Issue</div>
+                          <div className="text-[11px] text-slate-500 leading-snug">
+                            Submit crowdsourced road or terrain hazard
+                          </div>
+                        </div>
+                      </Link>
 
-                    <Link
-                      to="/my-reports"
-                      role="menuitem"
-                      onClick={() => setOpenDropdown(null)}
-                      className="flex items-start gap-3 px-4 py-3 hover:bg-teal/5 transition-colors group"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-teal group-hover:text-white transition-colors">
-                        <FileText className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="font-bold text-xs text-navy-900">My Contributions</div>
-                        <div className="text-[11px] text-slate-500 leading-snug">
-                          Track your submitted observations & lifecycle
+                      <Link
+                        to="/my-reports"
+                        role="menuitem"
+                        onClick={handleSubmenuLinkClick}
+                        className="flex items-start gap-3 px-4 py-3 hover:bg-teal/5 transition-colors group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-teal group-hover:text-white transition-colors">
+                          <FileText className="w-4 h-4" />
                         </div>
-                      </div>
-                    </Link>
+                        <div>
+                          <div className="font-bold text-xs text-navy-900">My Contributions</div>
+                          <div className="text-[11px] text-slate-500 leading-snug">
+                            Track your submitted observations & lifecycle
+                          </div>
+                        </div>
+                      </Link>
+                    </div>
                   </div>
                 )}
               </div>
@@ -396,24 +516,35 @@ export const Navbar: React.FC = () => {
               {/* 4. Trust & Safety Group Dropdown */}
               <div
                 className="relative"
-                onMouseEnter={() => setOpenDropdown('trust')}
-                onMouseLeave={() => setOpenDropdown(null)}
+                onMouseEnter={() => handleGroupMouseEnter('trust')}
+                onMouseLeave={handleGroupMouseLeave}
               >
                 <button
+                  ref={(el) => (triggerRefs.current['trust'] = el)}
+                  id="trust-nav-trigger"
                   type="button"
-                  onClick={() => toggleDropdown('trust')}
+                  onClick={() => handleTriggerClick('trust')}
                   aria-expanded={openDropdown === 'trust'}
                   aria-haspopup="true"
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-teal/30 ${
+                  aria-controls="trust-nav-menu"
+                  onKeyDown={(e) => {
+                    if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+                      if (openDropdown !== 'trust') {
+                        e.preventDefault();
+                        handleTriggerClick('trust');
+                      }
+                    }
+                  }}
+                  className={`px-2.5 py-2 xl:px-3 rounded-lg text-xs xl:text-sm font-medium transition-colors flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-teal/30 whitespace-nowrap ${
                     isTrustActive
                       ? 'bg-teal/10 text-teal font-semibold'
                       : 'text-slateText hover:text-navy-900 hover:bg-slate-50'
                   }`}
                 >
-                  <ShieldCheck className="w-4 h-4 text-teal" />
+                  <ShieldCheck className="w-3.5 h-3.5 xl:w-4 xl:h-4 text-teal flex-shrink-0" />
                   <span>Trust & Safety</span>
                   <ChevronDown
-                    className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                    className={`w-3 h-3 xl:w-3.5 xl:h-3.5 transition-transform duration-200 ${
                       openDropdown === 'trust' ? 'rotate-180 text-teal' : 'text-slate-400'
                     }`}
                   />
@@ -421,59 +552,68 @@ export const Navbar: React.FC = () => {
 
                 {openDropdown === 'trust' && (
                   <div
-                    role="menu"
-                    className="absolute top-full left-0 mt-1 w-72 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50 animate-fade-in divide-y divide-slate-100"
+                    id="trust-nav-menu"
+                    aria-labelledby="trust-nav-trigger"
+                    onMouseEnter={handleSubmenuMouseEnter}
+                    onMouseLeave={handleGroupMouseLeave}
+                    className="absolute top-full left-0 pt-2 w-72 z-[1050] animate-fade-in focus:outline-none"
                   >
-                    <Link
-                      to="/official-alerts"
-                      role="menuitem"
-                      onClick={() => setOpenDropdown(null)}
-                      className="flex items-start gap-3 px-4 py-3 hover:bg-teal/5 transition-colors group"
+                    <div
+                      role="menu"
+                      aria-orientation="vertical"
+                      className="bg-white rounded-2xl shadow-xl border border-slate-200 py-2 divide-y divide-slate-100 overflow-hidden"
                     >
-                      <div className="w-8 h-8 rounded-lg bg-red-50 text-alertRed flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-alertRed group-hover:text-white transition-colors">
-                        <Radio className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="font-bold text-xs text-navy-900">Official Alerts</div>
-                        <div className="text-[11px] text-slate-500 leading-snug">
-                          IMD, CWC, NDMA and Traffic Police warnings
+                      <Link
+                        to="/official-alerts"
+                        role="menuitem"
+                        onClick={handleSubmenuLinkClick}
+                        className="flex items-start gap-3 px-4 py-3 hover:bg-teal/5 transition-colors group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-red-50 text-alertRed flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-alertRed group-hover:text-white transition-colors">
+                          <Radio className="w-4 h-4" />
                         </div>
-                      </div>
-                    </Link>
+                        <div>
+                          <div className="font-bold text-xs text-navy-900">Official Alerts</div>
+                          <div className="text-[11px] text-slate-500 leading-snug">
+                            IMD, CWC, NDMA and Traffic Police warnings
+                          </div>
+                        </div>
+                      </Link>
 
-                    <Link
-                      to="/source-centre"
-                      role="menuitem"
-                      onClick={() => setOpenDropdown(null)}
-                      className="flex items-start gap-3 px-4 py-3 hover:bg-teal/5 transition-colors group"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-teal group-hover:text-white transition-colors">
-                        <Database className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="font-bold text-xs text-navy-900">Source Centre</div>
-                        <div className="text-[11px] text-slate-500 leading-snug">
-                          Data provenance, verification tiers & sync status
+                      <Link
+                        to="/source-centre"
+                        role="menuitem"
+                        onClick={handleSubmenuLinkClick}
+                        className="flex items-start gap-3 px-4 py-3 hover:bg-teal/5 transition-colors group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-teal group-hover:text-white transition-colors">
+                          <Database className="w-4 h-4" />
                         </div>
-                      </div>
-                    </Link>
+                        <div>
+                          <div className="font-bold text-xs text-navy-900">Source Centre</div>
+                          <div className="text-[11px] text-slate-500 leading-snug">
+                            Data provenance, verification tiers & sync status
+                          </div>
+                        </div>
+                      </Link>
 
-                    <Link
-                      to="/emergency-guide"
-                      role="menuitem"
-                      onClick={() => setOpenDropdown(null)}
-                      className="flex items-start gap-3 px-4 py-3 hover:bg-teal/5 transition-colors group"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                        <LifeBuoy className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="font-bold text-xs text-navy-900">Emergency Guide</div>
-                        <div className="text-[11px] text-slate-500 leading-snug">
-                          Verified 112, 1033 helplines & breakdown protocols
+                      <Link
+                        to="/emergency-guide"
+                        role="menuitem"
+                        onClick={handleSubmenuLinkClick}
+                        className="flex items-start gap-3 px-4 py-3 hover:bg-teal/5 transition-colors group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                          <LifeBuoy className="w-4 h-4" />
                         </div>
-                      </div>
-                    </Link>
+                        <div>
+                          <div className="font-bold text-xs text-navy-900">Emergency Guide</div>
+                          <div className="text-[11px] text-slate-500 leading-snug">
+                            Verified 112, 1033 helplines & breakdown protocols
+                          </div>
+                        </div>
+                      </Link>
+                    </div>
                   </div>
                 )}
               </div>
@@ -481,13 +621,13 @@ export const Navbar: React.FC = () => {
               {/* AI Assistant Single Item */}
               <Link
                 to="/assistant"
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-teal/30 ${
+                className={`px-2.5 py-2 xl:px-3 rounded-lg text-xs xl:text-sm font-medium transition-colors flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-teal/30 whitespace-nowrap ${
                   isAssistantActive
                     ? 'bg-teal/10 text-teal font-semibold'
                     : 'text-slateText hover:text-navy-900 hover:bg-slate-50'
                 }`}
               >
-                <Bot className="w-4 h-4 text-teal" />
+                <Bot className="w-3.5 h-3.5 xl:w-4 xl:h-4 text-teal flex-shrink-0" />
                 <span>AI Assistant</span>
               </Link>
             </nav>
@@ -498,30 +638,30 @@ export const Navbar: React.FC = () => {
           )}
 
           {/* Right Action / Auth Buttons */}
-          <div className="hidden lg:flex items-center space-x-2">
+          <div className="hidden lg:flex items-center space-x-1 xl:space-x-2 flex-shrink-0">
             {user ? (
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1 xl:space-x-2">
                 {/* Notifications */}
                 <Link
                   to="/notifications"
-                  className="p-2 text-slateText hover:text-navy-900 hover:bg-slate-100 rounded-lg relative transition-colors focus:outline-none focus:ring-2 focus:ring-teal/30"
+                  className="p-2 text-slateText hover:text-navy-900 hover:bg-slate-100 rounded-lg relative transition-colors focus:outline-none focus:ring-2 focus:ring-teal/30 flex-shrink-0"
                   title="Notifications & Corridor Bulletins"
                   aria-label="Notifications"
                 >
-                  <Bell className="w-5 h-5" />
+                  <Bell className="w-4 h-4 xl:w-5 xl:h-5" />
                   <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-alertRed rounded-full"></span>
                 </Link>
 
                 {/* Dashboard */}
                 <Link
                   to="/app"
-                  className={`px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition-colors ${
+                  className={`px-2.5 py-1.5 xl:px-3 xl:py-2 rounded-lg text-xs xl:text-sm font-medium flex items-center gap-1.5 transition-colors whitespace-nowrap ${
                     isDashboardActive
                       ? 'bg-navy-900 text-white shadow-xs'
                       : 'text-navy-900 bg-slate-100 hover:bg-slate-200'
                   }`}
                 >
-                  <Compass className="w-4 h-4" />
+                  <Compass className="w-3.5 h-3.5 xl:w-4 xl:h-4 text-teal" />
                   <span>Dashboard</span>
                 </Link>
 
@@ -529,7 +669,7 @@ export const Navbar: React.FC = () => {
                 {isAdmin && (
                   <Link
                     to="/admin"
-                    className="px-2.5 py-1.5 bg-purple-100 hover:bg-purple-200 text-purple-900 text-xs font-bold rounded-lg transition-colors border border-purple-300"
+                    className="px-2 py-1 xl:px-2.5 xl:py-1.5 bg-purple-100 hover:bg-purple-200 text-purple-900 text-xs font-bold rounded-lg transition-colors border border-purple-300 whitespace-nowrap flex-shrink-0"
                     title="Administrative Console"
                   >
                     Admin
@@ -539,11 +679,11 @@ export const Navbar: React.FC = () => {
                 {/* Profile */}
                 <Link
                   to="/profile"
-                  className="flex items-center gap-2 p-1 rounded-lg hover:bg-slate-100 transition-colors focus:outline-none focus:ring-2 focus:ring-teal/30"
+                  className="flex items-center gap-1.5 p-1 rounded-lg hover:bg-slate-100 transition-colors focus:outline-none focus:ring-2 focus:ring-teal/30 flex-shrink-0"
                   title={`Profile & Settings (${user.name})`}
                   aria-label="Profile"
                 >
-                  <div className="w-8 h-8 rounded-full bg-teal text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                  <div className="w-7 h-7 xl:w-8 xl:h-8 rounded-full bg-teal text-white flex items-center justify-center font-bold text-xs shadow-xs">
                     {user.name.charAt(0).toUpperCase()}
                   </div>
                 </Link>
@@ -551,11 +691,11 @@ export const Navbar: React.FC = () => {
                 {/* Log Out */}
                 <button
                   onClick={handleLogout}
-                  className="p-2 text-slateText hover:text-alertRed hover:bg-red-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-red-200"
+                  className="p-1.5 xl:p-2 text-slateText hover:text-alertRed hover:bg-red-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-red-200 flex-shrink-0"
                   title="Log Out"
                   aria-label="Log out of TravelLord AI"
                 >
-                  <LogOut className="w-5 h-5" />
+                  <LogOut className="w-4 h-4 xl:w-5 xl:h-5" />
                 </button>
               </div>
             ) : (

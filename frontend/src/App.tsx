@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { SupportModal } from './components/SupportModal';
+import { FloatingAssistant } from './components/FloatingAssistant';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
 import { LandingPage } from './pages/LandingPage';
@@ -89,6 +90,7 @@ export const App: React.FC = () => {
           </main>
           <Footer />
           <SupportModal />
+          <FloatingAssistant />
         </div>
       </Router>
     </AuthProvider>

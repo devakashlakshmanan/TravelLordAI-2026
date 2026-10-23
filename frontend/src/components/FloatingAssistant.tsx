@@ -59,15 +59,26 @@ export const FloatingAssistant: React.FC = () => {
     }
   }, [isOpen, messages, loading]);
 
-  // Close on Escape key
+  // Close on Escape key or outside click
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
         setIsOpen(false);
       }
     };
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (panelRef.current && !panelRef.current.contains(e.target as Node) && isOpen) {
+        setIsOpen(false);
+      }
+    };
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, [isOpen]);
 
   const handleSend = async (queryText?: string) => {
@@ -203,7 +214,7 @@ export const FloatingAssistant: React.FC = () => {
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-40 group flex items-center gap-2.5 px-4 py-3 bg-navy-900 hover:bg-teal text-white rounded-full shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-teal/30 border border-teal/40"
+          className="fixed bottom-6 right-6 z-[900] group flex items-center gap-2.5 px-4 py-3 bg-navy-900 hover:bg-teal text-white rounded-full shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-teal/30 border border-teal/40"
           aria-label="Open TravelLord AI Assistant"
         >
           <div className="relative">
@@ -221,7 +232,10 @@ export const FloatingAssistant: React.FC = () => {
       {isOpen && (
         <div
           ref={panelRef}
-          className="fixed z-40 bottom-4 right-4 sm:bottom-6 sm:right-6 w-[calc(100vw-2rem)] sm:w-96 h-[540px] max-h-[calc(100vh-6rem)] bg-white rounded-2xl shadow-2xl border border-slate-200/90 flex flex-col overflow-hidden animate-fade-in"
+          role="dialog"
+          aria-modal="true"
+          aria-label="TravelLord AI Assistant"
+          className="fixed z-[1050] bottom-4 right-4 sm:bottom-6 sm:right-6 w-[calc(100vw-2rem)] sm:w-96 h-[540px] max-h-[calc(100vh-6rem)] bg-white rounded-2xl shadow-2xl border border-slate-200/90 flex flex-col overflow-hidden animate-fade-in"
         >
           {/* Header */}
           <div className="bg-navy-900 text-white p-3.5 px-4 flex items-center justify-between border-b border-navy-800 flex-shrink-0">

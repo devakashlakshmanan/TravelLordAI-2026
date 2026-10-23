@@ -18,6 +18,7 @@ export const AdminPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [actionNotes, setActionNotes] = useState<Record<string, string>>({});
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (isAdmin) {
@@ -50,13 +51,15 @@ export const AdminPage: React.FC = () => {
     action: 'approve' | 'corroborate' | 'reject' | 'resolve'
   ) => {
     try {
+      setErrorMessage(null);
       const notes = actionNotes[id] || '';
       await api.moderateReport(id, action, notes);
       setFeedback(`Report ${id} successfully transitioned via action: ${action.toUpperCase()}`);
       setTimeout(() => setFeedback(null), 3000);
       loadData();
     } catch (err: any) {
-      alert(`Moderation failed: ${err.message}`);
+      setErrorMessage(`Moderation failed: ${err.message || 'Unknown error occurred'}`);
+      setTimeout(() => setErrorMessage(null), 5000);
     }
   };
 
@@ -107,9 +110,16 @@ export const AdminPage: React.FC = () => {
       </div>
 
       {feedback && (
-        <div className="p-3 bg-emerald-50 border border-emerald-300 rounded-xl text-xs font-bold text-emerald-900 flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+        <div className="p-3 bg-emerald-50 border border-emerald-300 rounded-xl text-xs font-bold text-emerald-900 flex items-center gap-2 animate-fade-in">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
           <span>{feedback}</span>
+        </div>
+      )}
+
+      {errorMessage && (
+        <div className="p-3 bg-red-50 border border-red-300 rounded-xl text-xs font-bold text-red-900 flex items-center gap-2 animate-fade-in">
+          <AlertTriangle className="w-4 h-4 text-alertRed flex-shrink-0" />
+          <span>{errorMessage}</span>
         </div>
       )}
 

@@ -56,6 +56,16 @@ export const ThreatCentrePage: React.FC = () => {
   const [showCoverageModal, setShowCoverageModal] = useState<boolean>(false);
 
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showCoverageModal) {
+        setShowCoverageModal(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showCoverageModal]);
+
+  useEffect(() => {
     fetchIncidents();
   }, [selectedCategory, selectedSeverity, selectedVerification, selectedState, includeSampleData]);
 
@@ -376,8 +386,17 @@ export const ThreatCentrePage: React.FC = () => {
 
       {/* Coverage & Source Transparency Modal (Phase 11) */}
       {showCoverageModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy-900/60 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[85vh] overflow-y-auto border border-slate-200 p-6 space-y-5">
+        <div
+          className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-navy-900/60 backdrop-blur-sm animate-fadeIn"
+          onClick={() => setShowCoverageModal(false)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="National Data Coverage & Feed Transparency"
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[85vh] overflow-y-auto border border-slate-200 p-6 space-y-5 animate-slide-up"
+          >
             <div className="flex items-center justify-between border-b border-slate-200 pb-4">
               <div className="flex items-center gap-2">
                 <Database className="w-5 h-5 text-teal" />

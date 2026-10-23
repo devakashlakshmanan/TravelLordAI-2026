@@ -5,7 +5,7 @@ import { Shield, ExternalLink, AlertCircle } from 'lucide-react';
 export const Footer: React.FC = () => {
   return (
     <footer className="bg-navy-900 text-slate-300 border-t border-slate-800 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-20 sm:pb-20">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand Info */}
           <div className="space-y-4 md:col-span-1">

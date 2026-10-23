@@ -112,6 +112,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   const [showWildlife, setShowWildlife] = useState(true);
   const [showRoadDisruptions, setShowRoadDisruptions] = useState(true);
   const [showBuffers, setShowBuffers] = useState(false);
+  const [layersExpandedMobile, setLayersExpandedMobile] = useState(false);
 
   // Filtered incidents by layer toggle
   const filteredIncidents = useMemo(() => {
@@ -138,13 +139,24 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   return (
     <div className="relative w-full overflow-hidden rounded-2xl shadow-card border border-slate-200" style={{ height }}>
       {/* Layer Controls Pill */}
-      <div className="absolute top-4 right-4 z-[400] bg-white/95 backdrop-blur-md px-3.5 py-2.5 rounded-xl shadow-card border border-slate-200 text-xs text-navy-900">
-        <div className="flex items-center gap-1.5 font-bold mb-2 text-slate-800">
-          <Layers className="w-3.5 h-3.5 text-teal" />
-          <span>Threat Layers</span>
-        </div>
-        <div className="flex flex-col gap-1.5 font-medium">
-          <label className="flex items-center gap-2 cursor-pointer hover:text-teal">
+      <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-[400] bg-white/95 backdrop-blur-md px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-xl shadow-card border border-slate-200 text-xs text-navy-900 max-w-[calc(100vw-3rem)]">
+        <button
+          type="button"
+          onClick={() => setLayersExpandedMobile((prev) => !prev)}
+          className="w-full flex items-center justify-between gap-2 font-bold text-slate-800 sm:cursor-default"
+          aria-expanded={layersExpandedMobile}
+          aria-label="Toggle threat layers filter"
+        >
+          <div className="flex items-center gap-1.5">
+            <Layers className="w-3.5 h-3.5 text-teal" />
+            <span>Threat Layers</span>
+          </div>
+          <span className="text-[10px] sm:hidden text-teal font-semibold">
+            {layersExpandedMobile ? 'Hide' : 'Show'}
+          </span>
+        </button>
+        <div className={`mt-2 flex-col gap-1.5 font-medium ${layersExpandedMobile ? 'flex' : 'hidden sm:flex'}`}>
+          <label className="flex items-center gap-2 cursor-pointer hover:text-teal text-[11px] sm:text-xs">
             <input
               type="checkbox"
               checked={showWeather}
@@ -153,7 +165,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
             />
             <span>Meteorological (IMD)</span>
           </label>
-          <label className="flex items-center gap-2 cursor-pointer hover:text-teal">
+          <label className="flex items-center gap-2 cursor-pointer hover:text-teal text-[11px] sm:text-xs">
             <input
               type="checkbox"
               checked={showLandslide}
@@ -162,7 +174,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
             />
             <span>Landslides & Slopes (GSI)</span>
           </label>
-          <label className="flex items-center gap-2 cursor-pointer hover:text-teal">
+          <label className="flex items-center gap-2 cursor-pointer hover:text-teal text-[11px] sm:text-xs">
             <input
               type="checkbox"
               checked={showWildlife}
@@ -171,7 +183,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
             />
             <span>Wildlife Corridors</span>
           </label>
-          <label className="flex items-center gap-2 cursor-pointer hover:text-teal">
+          <label className="flex items-center gap-2 cursor-pointer hover:text-teal text-[11px] sm:text-xs">
             <input
               type="checkbox"
               checked={showRoadDisruptions}
@@ -180,7 +192,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
             />
             <span>Roadblocks & Disruptions</span>
           </label>
-          <label className="flex items-center gap-2 cursor-pointer hover:text-teal pt-1 border-t border-slate-100 text-[11px] text-slateText">
+          <label className="flex items-center gap-2 cursor-pointer hover:text-teal pt-1 border-t border-slate-100 text-[10px] sm:text-[11px] text-slateText">
             <input
               type="checkbox"
               checked={showBuffers}

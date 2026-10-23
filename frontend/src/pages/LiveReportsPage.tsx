@@ -29,6 +29,16 @@ export const LiveReportsPage: React.FC = () => {
   const [disputeNotes, setDisputeNotes] = useState<string>('');
   const [submittingAction, setSubmittingAction] = useState<boolean>(false);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && disputeReportId) {
+        setDisputeReportId(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [disputeReportId]);
+
   const fetchReports = async () => {
     try {
       setLoading(true);
@@ -401,9 +411,18 @@ export const LiveReportsPage: React.FC = () => {
 
         {/* Dispute Modal */}
         {disputeReportId && (
-          <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200">
-              <h3 className="font-heading font-bold text-base text-navy-900 mb-2 flex items-center gap-2">
+          <div
+            className="fixed inset-0 z-[1100] bg-navy-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
+            onClick={() => setDisputeReportId(null)}
+          >
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="dispute-modal-title"
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 animate-slide-up"
+            >
+              <h3 id="dispute-modal-title" className="font-heading font-bold text-base text-navy-900 mb-2 flex items-center gap-2">
                 <AlertOctagon className="w-4 h-4 text-rose-600" />
                 Dispute Community Observation
               </h3>

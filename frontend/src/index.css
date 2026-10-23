@@ -44,9 +44,25 @@
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.25s ease-out forwards;
+  animation: fadeIn 0.2s ease-out forwards;
 }
 
 .animate-slide-up {
-  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* Accessibility: Clear focus indicators */
+:focus-visible {
+  outline: 2px solid #147D75;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+

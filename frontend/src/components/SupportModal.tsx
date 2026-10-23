@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HelpCircle, X, Mail, AlertTriangle, FileText, Send, CheckCircle2, AlertCircle } from 'lucide-react';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -11,6 +11,16 @@ export const SupportModal: React.FC = () => {
   const [submittedRef, setSubmittedRef] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,13 +44,12 @@ export const SupportModal: React.FC = () => {
     }
   };
 
-
   return (
     <>
-      {/* Floating Action Button */}
+      {/* Floating Action Button (Positioned at bottom-left to avoid colliding with AI Assistant on the right) */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-40 bg-navy-900 hover:bg-teal text-white p-3.5 rounded-full shadow-hover flex items-center gap-2 border border-slate-700 transition-all transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-mint"
+        className="fixed bottom-6 left-6 z-[900] bg-navy-900 hover:bg-teal text-white p-3 sm:px-4 sm:py-3 rounded-full shadow-hover flex items-center gap-2 border border-slate-700 transition-all transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-mint"
         title="Help & Support Centre"
         aria-label="Open Help and Support"
       >
@@ -50,17 +59,26 @@ export const SupportModal: React.FC = () => {
 
       {/* Support Drawer / Modal */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-end p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full sm:max-w-md max-h-[85vh] flex flex-col overflow-hidden animate-slide-up">
+        <div
+          className="fixed inset-0 z-[1100] flex items-end sm:items-center justify-center sm:justify-start p-4 bg-navy-900/60 backdrop-blur-sm animate-fade-in"
+          onClick={() => setIsOpen(false)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="support-modal-title"
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full sm:max-w-md max-h-[85vh] flex flex-col overflow-hidden animate-slide-up sm:ml-4"
+          >
             {/* Header */}
             <div className="bg-navy-900 text-white px-5 py-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <HelpCircle className="w-5 h-5 text-mint" />
-                <h3 className="font-heading font-bold text-base">TravelLord Support Centre</h3>
+                <h3 id="support-modal-title" className="font-heading font-bold text-base">TravelLord Support Centre</h3>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg transition-colors"
+                className="text-slate-400 hover:text-white p-1 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-mint"
                 aria-label="Close Support Modal"
               >
                 <X className="w-5 h-5" />
