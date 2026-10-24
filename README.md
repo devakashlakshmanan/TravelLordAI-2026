@@ -1,341 +1,454 @@
 
+
 <div align="center">
 
-# 🌍 TravelLord AI
+<img src="https://capsule-render.vercel.app/api?type=rounded&height=260&color=0:0F172A,40:0F766E,75:06B6D4,100:7C3AED&text=TravelLord%20AI&fontColor=FFFFFF&fontSize=56&fontAlignY=40&desc=Your%20Intelligent%20Travel%20Risk%20Awareness%20Companion&descSize=15&descAlignY=63&animation=fadeIn&stroke=0F766E&strokeWidth=1" width="100%" alt="TravelLord AI — Your Intelligent Travel Risk Awareness Companion"/>
 
-### Your Intelligent Travel Risk Awareness Companion
+<br/>
 
-**Know the risks. Plan your journey. Travel with awareness.**
+### 🌍 Know the Risks. Plan Your Journey. Travel with Awareness.
 
-A traveller-focused platform that brings together location-based hazard awareness, route risk information, official alerts, and community-reported incidents to help people make more informed travel decisions across India.
+**An AI-assisted travel-risk awareness platform built for informed journeys across India.**
 
-<p>
-  <img src="https://img.shields.io/badge/Project-TravelLord%20AI-0D9488?style=for-the-badge&logo=googlemaps&logoColor=white" alt="Project"/>
-  <img src="https://img.shields.io/badge/Platform-Web%20%7C%20Mobile--Friendly-2563EB?style=for-the-badge&logo=responsive&logoColor=white" alt="Platform"/>
-  <img src="https://img.shields.io/badge/AI--Powered-Travel%20Assistance-7C3AED?style=for-the-badge&logo=openai&logoColor=white" alt="AI Powered"/>
-  <img src="https://img.shields.io/badge/Geography-India-FF9933?style=for-the-badge&logo=googleearth&logoColor=white" alt="India"/>
-</p>
+</div>
 
-<p>
-  <b>🛣️ Route Awareness</b> &nbsp; • &nbsp;
-  <b>⚠️ Hazard Reporting</b> &nbsp; • &nbsp;
-  <b>🗺️ Interactive Maps</b> &nbsp; • &nbsp;
-  <b>🤖 AI Assistance</b>
-</p>
+
+<br/>
+
+<a href="https://github.com/devakashlakshmanan/TravelLordAI-2026">
+  <img src="https://img.shields.io/badge/Explore-Repository-0F766E?style=for-the-badge&logo=github&logoColor=white" alt="Explore repository"/>
+</a>
+<a href="#-installation">
+  <img src="https://img.shields.io/badge/Get-Started-2563EB?style=for-the-badge&logo=rocket&logoColor=white" alt="Get started"/>
+</a>
+<a href="#-system-architecture">
+  <img src="https://img.shields.io/badge/View-Architecture-7C3AED?style=for-the-badge&logo=diagramsdotnet&logoColor=white" alt="Architecture"/>
+</a>
+
+<br/><br/>
+
+<img src="https://img.shields.io/badge/Domain-Travel%20Safety-0D9488?style=flat-square" alt="Domain"/>
+<img src="https://img.shields.io/badge/Frontend-React%20%2B%20TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="Frontend"/>
+<img src="https://img.shields.io/badge/Backend-FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" alt="Backend"/>
+<img src="https://img.shields.io/badge/Maps-Leaflet-199900?style=flat-square" alt="Maps"/>
+<img src="https://img.shields.io/badge/AI-Groq%20Integration-7C3AED?style=flat-square" alt="AI integration"/>
+
+<br/>
+
+<i>Helping people make more informed travel decisions through accessible risk information.</i>
 
 </div>
 
 ---
 
-## 📌 Table of Contents
+## 🧭 Explore TravelLord AI
 
-- [🌟 About the Project](#-about-the-project)
-- [❗ Problem Statement](#-problem-statement)
-- [💡 Our Solution](#-our-solution)
-- [✨ Key Features](#-key-features)
-- [🧠 AI Innovation](#-ai-innovation)
-- [🏗️ System Architecture](#️-system-architecture)
-- [🛠️ Technology Stack](#️-technology-stack)
-- [📂 Project Structure](#-project-structure)
-- [⚙️ Installation and Setup](#️-installation-and-setup)
-- [🔐 Environment Configuration](#-environment-configuration)
-- [🔌 API Overview](#-api-overview)
-- [🗄️ Database](#️-database)
-- [🧪 Testing](#-testing)
-- [🛡️ Safety, Privacy and Data Transparency](#️-safety-privacy-and-data-transparency)
-- [🚀 Future Enhancements](#-future-enhancements)
-- [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
+<table>
+<tr>
+<td align="center" width="33%">
+<a href="#-about-the-project">
+<img src="https://img.shields.io/badge/01-About-0F766E?style=for-the-badge" alt="About"/>
+<br/><b>🌍 About</b>
+</a>
+<br/><sub>Vision and problem statement</sub>
+</td>
+<td align="center" width="33%">
+<a href="#-key-features">
+<img src="https://img.shields.io/badge/02-Features-2563EB?style=for-the-badge" alt="Features"/>
+<br/><b>✨ Features</b>
+</a>
+<br/><sub>Explore platform capabilities</sub>
+</td>
+<td align="center" width="33%">
+<a href="#-system-architecture">
+<img src="https://img.shields.io/badge/03-Architecture-7C3AED?style=for-the-badge" alt="Architecture"/>
+<br/><b>🏗️ Architecture</b>
+</a>
+<br/><sub>Understand the system</sub>
+</td>
+</tr>
+<tr>
+<td align="center">
+<a href="#-technology-stack">
+<img src="https://img.shields.io/badge/04-Tech_Stack-DB2777?style=for-the-badge" alt="Tech stack"/>
+<br/><b>🛠️ Technology</b>
+</a>
+<br/><sub>Tools and frameworks</sub>
+</td>
+<td align="center">
+<a href="#-installation">
+<img src="https://img.shields.io/badge/05-Installation-EA580C?style=for-the-badge" alt="Installation"/>
+<br/><b>⚙️ Installation</b>
+</a>
+<br/><sub>Run the project locally</sub>
+</td>
+<td align="center">
+<a href="#-testing">
+<img src="https://img.shields.io/badge/06-Testing-15803D?style=for-the-badge" alt="Testing"/>
+<br/><b>🧪 Testing</b>
+</a>
+<br/><sub>Validate functionality</sub>
+</td>
+</tr>
+</table>
 
 ---
 
 ## 🌟 About the Project
 
-**TravelLord AI** is a travel-risk awareness platform designed to help travellers understand potential hazards associated with their journeys and destinations.
+**TravelLord AI** is a traveller-oriented risk-awareness platform that brings relevant travel information into one accessible interface.
 
-Information about road blockages, extreme weather alerts, landslides, flooding, wildlife movement, accidents, and local disturbances can be distributed across multiple sources. Finding relevant information at the right time can be difficult, especially when travelling through unfamiliar locations.
+Information about flooding, landslides, road disruptions, wildlife-related incidents, accidents, and local disturbances may be spread across different services and communities. Travellers can find it difficult to identify which information is relevant to a particular location or journey.
 
-TravelLord AI aims to bring relevant risk information into one accessible platform, combining interactive maps, journey planning, official alerts, community reports, and AI-assisted information access.
+TravelLord AI aims to simplify this process by combining:
 
-🎯 **Our mission:** Make travel-related risk information easier to discover, understand, and share.
+- 🗺️ Interactive maps and journey planning
+- ⚠️ Location-based risk and incident information
+- 🌦️ Available weather information and official alerts
+- 👥 Community-contributed hazard reports
+- 🤖 AI-assisted explanations and travel-awareness guidance
+- 🛡️ Source transparency and report-status information
 
-> TravelLord AI supports informed decision-making. It does not guarantee a risk-free journey or replace official emergency instructions.
+<div align="center">
 
----
+### 🎯 Our Mission
 
-## ❗ Problem Statement
+**Make travel-risk information easier to discover, understand, and share.**
 
-Travellers often encounter difficulties when trying to identify potential risks along their routes or at their destinations.
+</div>
 
-- 🌧️ **Scattered information:** Weather warnings, road updates, and local reports are available across different sources.
-- 🛣️ **Limited route awareness:** Travellers may not know about reported hazards along their intended journey.
-- 📍 **Unfamiliar locations:** Visitors and regular travellers alike may lack reliable local risk information.
-- 👥 **Disconnected communities:** People who encounter hazards need a way to share useful information with other travellers.
-- ⏱️ **Information accessibility:** Understanding which alerts are relevant to a location can take time.
-
-The result is a need for a centralized, traveller-oriented platform that makes available risk information easier to access and interpret.
-
----
-
-## 💡 Our Solution
-
-TravelLord AI brings together multiple travel-awareness capabilities through a unified interface.
-
-| Challenge | TravelLord AI approach |
-|---|---|
-| Risk information is scattered | Centralized risk-awareness interface |
-| Hazards may affect a journey | Route-related risk information |
-| Travellers need local updates | Location-based incident discovery |
-| People encounter new hazards | Community hazard reporting |
-| Official warnings need visibility | Official alert and source information |
-| Information can be difficult to interpret | AI-assisted explanations and guidance |
-
-The platform emphasizes **awareness, transparency, and useful context**, rather than making unsupported predictions about future hazards.
+> ⚠️ TravelLord AI is an awareness tool. It does not guarantee a safe journey, independently verify every report, or replace official emergency instructions.
 
 ---
 
-## ✨ Key Features
+## ❗ The Problem We Address
 
-### 🗺️ 1. Journey Planning and Route Awareness
+<table>
+<tr>
+<th align="center">Challenge</th>
+<th>Why It Matters</th>
+<th>Our Approach</th>
+</tr>
+<tr>
+<td align="center">🌧️ Scattered information</td>
+<td>Relevant warnings may be spread across multiple sources.</td>
+<td>Bring supported information into a unified interface.</td>
+</tr>
+<tr>
+<td align="center">🛣️ Route uncertainty</td>
+<td>Travellers may not know about reported hazards along their route.</td>
+<td>Present available route-related risk information.</td>
+</tr>
+<tr>
+<td align="center">📍 Unfamiliar locations</td>
+<td>Local conditions can be difficult for visitors and regular travellers to discover.</td>
+<td>Support location-based incident discovery.</td>
+</tr>
+<tr>
+<td align="center">👥 Limited information sharing</td>
+<td>Useful local observations may not reach other travellers.</td>
+<td>Provide community hazard-reporting capabilities.</td>
+</tr>
+<tr>
+<td align="center">🧠 Difficult information</td>
+<td>Warnings and incident details may be hard to interpret.</td>
+<td>Offer AI-assisted explanations using available context.</td>
+</tr>
+</table>
 
-- Explore journeys between selected locations.
-- View routes on an interactive map.
-- Present available risk information relevant to the journey.
-- Help travellers identify reported hazards and official alerts where data is available.
-- Access saved journeys and travel-related information.
+---
 
-### ⚠️ 2. Threat Centre
+## 💎 Key Features
 
-A centralized interface for exploring available hazard and incident information.
+<table>
+<tr>
+<td width="50%" valign="top">
 
-- Geotechnical hazards, including reported landslides and flooding.
-- Wildlife-related incidents and movement reports.
-- Road incidents, blockages, and traffic-related disruptions.
-- Social disturbances and other relevant local incidents.
-- Risk categories, source details, and available timestamps.
+### 🗺️ Journey Planner
 
-### 👥 3. Community Hazard Reporting
+Explore journeys and review available route-related information.
 
-Enable users to contribute information about hazards they encounter.
+- Route visualization on interactive maps
+- Journey origin and destination selection
+- Available hazard and incident context
+- Saved journey capabilities where implemented
 
-- Submit a hazard report with relevant details.
-- Associate reports with a location and category.
-- Share reports for wider traveller awareness.
-- Track personal contributions.
-- Support review and verification workflows where implemented.
+</td>
+<td width="50%" valign="top">
 
-**Important:** A community-submitted report should not automatically be presented as an officially verified incident.
+### ⚠️ Threat Centre
 
-### 🌦️ 4. Official Alerts and Information Sources
+Explore reported hazards and relevant incident information.
 
-Bring relevant information from supported external sources into a single interface.
+- Geotechnical hazards
+- Wildlife-related incidents
+- Road disruptions and accidents
+- Social and local disturbances
+- Available source and timestamp details
 
-Potential source categories include:
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
 
-- Weather information and alerts.
-- Flood-related information.
-- Geological hazard information.
-- Traffic and road updates.
-- Other permitted and relevant public information.
+### 👥 Community Reports
 
-Source availability depends on the actual integration, service availability, API restrictions, and geographic coverage.
+Share local observations that may help other travellers.
 
-### 🤖 5. AI Travel Assistant
+- Submit hazard information
+- Associate reports with locations
+- Track personal contributions
+- Support report review and verification workflows
 
-The AI Assistant is designed to help users understand information available through the platform.
+</td>
+<td width="50%" valign="top">
 
-It can support tasks such as:
+### 🌦️ Official Alerts
 
-- Explaining hazard categories and risk information.
-- Helping users interpret available route information.
-- Answering travel-awareness questions.
-- Providing guidance based on available platform context.
+Access information from supported external sources.
 
-Where configured, the assistant can use the Groq API.
+- Available weather information
+- Official alerts where integrated
+- Road and traffic information where supported
+- Source and freshness awareness
 
-AI-generated explanations should remain grounded in available evidence and must not be treated as confirmation of an incident or a guarantee of safety.
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
 
-### 🔔 6. Notifications and Awareness
+### 🤖 AI Travel Assistant
 
-Where implemented, notifications can help users access relevant updates, report activity, and travel-related information.
+Make available information easier to understand.
 
-### 📚 7. Travel Safety Resources
+- Explain hazard categories
+- Answer travel-awareness questions
+- Help interpret available journey information
+- Provide contextual assistance when configured
 
-Additional platform modules support traveller awareness through:
+</td>
+<td width="50%" valign="top">
 
-- Hazard guides.
-- Emergency guidance.
-- Travel information and discovery.
-- Travel packs and saved information.
-- Source transparency.
-- User profiles and preferences.
+### 🛡️ Trust and Safety
 
-### 🛡️ 8. Administration and Trust
+Promote responsible use of risk information.
 
-Administrative capabilities can support the management and review of reports, source information, and platform activity, subject to implemented access controls.
+- Source transparency
+- Report-status awareness
+- User account and access controls
+- Emergency guidance and safety resources
+
+</td>
+</tr>
+</table>
+
+<details>
+<summary><b>🔎 Explore additional platform modules</b></summary>
+
+Depending on the modules enabled in the application, TravelLord AI may also provide:
+
+- 🔔 Notifications
+- 🎒 Travel Pack
+- 🧭 Discover
+- 📚 Hazard Guide
+- 🚨 Emergency Guide
+- 📡 Source Centre
+- 📰 Live Reports
+- 👤 User Profile and Preferences
+- 🛠️ Administration Portal
+- 💬 Support interface
+
+The availability and behavior of each module depend on the current implementation and configuration.
+
+</details>
 
 ---
 
 ## 🧠 AI Innovation
 
-TravelLord AI focuses on making risk information more accessible and understandable through AI-assisted interaction.
+TravelLord AI focuses on using AI to make available information easier to understand.
 
-### How AI contributes
+<div align="center">
 
-1. **Context-aware assistance:** Help users interpret available platform information.
-2. **Information explanation:** Present complex hazard details in clearer language.
-3. **Traveller-focused responses:** Organize answers around locations, journeys, and reported risks.
-4. **Evidence-aware communication:** Distinguish available information from missing or uncertain evidence.
+| Capability | Purpose |
+|:---|:---|
+| 🧩 Context-aware assistance | Help interpret information available through the platform |
+| 💬 Natural-language explanations | Make complex details easier to understand |
+| 📍 Travel-focused responses | Organize information around locations and journeys |
+| 🔎 Evidence-aware communication | Communicate uncertainty and information limitations |
 
-### Our design principle
+</div>
 
-> AI should help people understand available evidence — not invent hazards, claim certainty, or replace official safety decisions.
+### Responsible AI principle
 
-TravelLord AI is designed as an **awareness platform**, not a predictive hazard forecasting system.
+> **AI should help travellers understand available evidence — not invent hazards, claim certainty, or replace official safety decisions.**
+
+Where configured, the AI Assistant can use the Groq API. Its actual capabilities depend on the backend integration and the information supplied to it.
+
+**Design decision:** TravelLord AI focuses on risk awareness and information accessibility, not predictive hazard forecasting.
 
 ---
 
 ## 🏗️ System Architecture
 
-The following diagram illustrates the intended high-level architecture. Exact data flows depend on the integrations enabled in the deployed application.
+The following diagram shows the intended high-level system design. It is a conceptual overview rather than a guarantee that every integration is active in every deployment.
 
 ```mermaid
 flowchart TD
-    A["👤 Traveller"] --> B["💻 TravelLord AI Frontend"]
+    U(["👤 Traveller"])
 
-    B --> C["🔐 Authentication"]
-    B --> D["🛣️ Journey Planning"]
-    B --> E["⚠️ Threat Centre"]
-    B --> F["👥 Community Reports"]
-    B --> G["🤖 AI Assistant"]
+    subgraph FRONTEND["💻 Frontend"]
+        UI["React + TypeScript"]
+        MAP["Interactive Maps"]
+        JOURNEY["Journey Planner"]
+        REPORT["Community Reports"]
+        ASSIST["AI Assistant"]
+    end
 
-    C --> H["⚙️ FastAPI Backend"]
-    D --> H
-    E --> H
-    F --> H
-    G --> H
+    subgraph BACKEND["⚙️ Backend"]
+        API["FastAPI"]
+        AUTH["Authentication and Authorization"]
+        RISK["Risk and Incident Services"]
+        INTEGRATION["External Service Integrations"]
+    end
 
-    H --> I[("🗄️ Database")]
-    H --> J["🌦️ External Data Sources"]
-    H --> K["🗺️ Mapping and Routing Services"]
-    H --> L["🧠 AI API"]
+    DB[("🗄️ Application Database")]
+    SOURCES["🌦️ Supported Data Sources"]
+    ROUTING["🗺️ Mapping and Routing Services"]
+    AI["🧠 AI API — Optional"]
 
-    J --> H
-    K --> H
-    L --> H
+    U --> UI
+    UI --> MAP
+    UI --> JOURNEY
+    UI --> REPORT
+    UI --> ASSIST
 
-    H --> M["📊 Processed Risk Information"]
-    M --> B
+    UI <--> API
+    API --> AUTH
+    API --> RISK
+    API --> INTEGRATION
+
+    AUTH <--> DB
+    RISK <--> DB
+    INTEGRATION <--> SOURCES
+    INTEGRATION <--> ROUTING
+    ASSIST <--> API
+    API <--> AI
+
+    classDef user fill:#0F766E,color:#FFFFFF,stroke:#115E59
+    classDef front fill:#DBEAFE,color:#1E3A8A,stroke:#2563EB
+    classDef back fill:#D1FAE5,color:#064E3B,stroke:#059669
+    classDef external fill:#F3E8FF,color:#581C87,stroke:#9333EA
+
+    class U user
+    class UI,MAP,JOURNEY,REPORT,ASSIST front
+    class API,AUTH,RISK,INTEGRATION back
+    class DB,SOURCES,ROUTING,AI external
 ```
 
-### Architecture overview
+<details>
+<summary><b>📐 Architecture explained</b></summary>
 
-| Layer | Responsibility |
+| Component | Responsibility |
 |---|---|
-| Frontend | User interface, maps, navigation, and interactions |
-| Backend | API endpoints, application logic, and integrations |
-| Database | Persistent application data |
-| Mapping services | Map data, geocoding, and route retrieval |
-| External sources | Available weather, alert, and incident information |
-| AI service | AI-assisted responses when configured |
+| Frontend | Pages, navigation, user interactions, and maps |
+| FastAPI backend | API requests and application logic |
+| Authentication | Identity verification and protected operations |
+| Risk services | Access to supported risk and incident information |
+| Database | Persistence for configured application records |
+| External integrations | Retrieval of available third-party information |
+| AI API | AI-assisted responses when configured |
+
+</details>
 
 ---
 
 ## 🛠️ Technology Stack
 
-The project uses the following technologies in its current architecture.
+<div align="center">
 
-<table>
-  <tr>
-    <th>Category</th>
-    <th>Technology</th>
-  </tr>
-  <tr>
-    <td>🎨 Frontend</td>
-    <td>React, TypeScript, Vite</td>
-  </tr>
-  <tr>
-    <td>💅 Styling</td>
-    <td>Tailwind CSS</td>
-  </tr>
-  <tr>
-    <td>🧭 Navigation</td>
-    <td>React Router</td>
-  </tr>
-  <tr>
-    <td>🗺️ Maps</td>
-    <td>Leaflet, React-Leaflet, OpenStreetMap</td>
-  </tr>
-  <tr>
-    <td>⚙️ Backend</td>
-    <td>Python, FastAPI, Pydantic</td>
-  </tr>
-  <tr>
-    <td>🗄️ Database</td>
-    <td>SQLite for local development, SQLAlchemy</td>
-  </tr>
-  <tr>
-    <td>🌐 Routing and geocoding</td>
-    <td>OSRM, OpenStreetMap Nominatim</td>
-  </tr>
-  <tr>
-    <td>🌦️ Weather integration</td>
-    <td>Open-Meteo and configured data-source adapters</td>
-  </tr>
-  <tr>
-    <td>🤖 AI integration</td>
-    <td>Groq API, when configured</td>
-  </tr>
-</table>
+### Frontend
+
+<img src="https://skillicons.dev/icons?i=react,ts,vite,tailwind&theme=light" alt="React, TypeScript, Vite and Tailwind CSS"/>
+
+### Backend and Data
+
+<img src="https://skillicons.dev/icons?i=python,fastapi,sqlite&theme=light" alt="Python, FastAPI and SQLite"/>
+
+</div>
+
+| Area | Technologies |
+|---|---|
+| Frontend | React, TypeScript, Vite |
+| Styling | Tailwind CSS |
+| Navigation | React Router |
+| Maps | Leaflet, React-Leaflet, OpenStreetMap |
+| Backend | Python, FastAPI, Pydantic |
+| ORM and persistence | SQLAlchemy, SQLite for local development |
+| Geocoding and routing | OpenStreetMap Nominatim, OSRM |
+| Weather | Open-Meteo and configured data-source adapters |
+| AI | Groq API when configured |
+| Version control | Git and GitHub |
 
 ---
 
 ## 📂 Project Structure
 
-The repository is organized into frontend and backend components. The exact files may differ as development progresses.
+The following is a representative structure. Check your repository for the exact file and folder names.
 
 ```text
 TravelLordAI-2026/
 │
-├── frontend/                  # React application
+├── frontend/
 │   ├── src/
-│   │   ├── components/        # Shared UI components
-│   │   ├── pages/             # Application pages
-│   │   ├── services/          # API integration
-│   │   └── ...                # Other frontend modules
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   └── ...
 │   ├── package.json
 │   └── vite.config.ts
 │
-├── backend/                   # FastAPI application
+├── backend/
 │   ├── app/
-│   │   ├── api/               # API endpoints
-│   │   ├── models/            # Data models
-│   │   ├── schemas/           # Request and response schemas
-│   │   └── ...                # Other backend modules
-│   └── ...
+│   │   ├── api/
+│   │   ├── models/
+│   │   ├── schemas/
+│   │   └── ...
+│   └── requirements.txt
 │
-├── docs/                      # Project documentation
+├── docs/
 ├── .gitignore
 └── README.md
 ```
 
-> This is a representative structure. Use the actual directory and file names in your local repository when following the setup instructions.
+<details>
+<summary><b>📁 What do these directories represent?</b></summary>
+
+- `frontend/` — Web application and user interface.
+- `frontend/src/components/` — Shared interface components, if organized this way.
+- `frontend/src/pages/` — Application pages, if organized this way.
+- `backend/` — API and server-side application.
+- `backend/app/api/` — API routes, if organized this way.
+- `backend/app/models/` — Database models, if organized this way.
+- `docs/` — Project documentation, where present.
+- `.gitignore` — Files and folders excluded from Git tracking.
+
+</details>
 
 ---
 
-## ⚙️ Installation and Setup
+## ⚙️ Installation
 
-Follow these steps to run the project locally.
+<details open>
+<summary><b>Step 1 — Prerequisites</b></summary>
 
-### Prerequisites
-
-Install the following:
+Install the following tools:
 
 - [Git](https://git-scm.com/)
 - [Python](https://www.python.org/downloads/)
-- [Node.js](https://nodejs.org/) with npm
+- [Node.js and npm](https://nodejs.org/)
 
-Check your installations:
+Verify the installations:
 
 ```bash
 git --version
@@ -344,325 +457,336 @@ node --version
 npm --version
 ```
 
-### 1. Clone the repository
+</details>
+
+<details open>
+<summary><b>Step 2 — Clone the repository</b></summary>
 
 ```bash
 git clone https://github.com/devakashlakshmanan/TravelLordAI-2026.git
-```
-
-Navigate into the project:
-
-```bash
 cd TravelLordAI-2026
 ```
 
-### 2. Install frontend dependencies
+</details>
+
+<details>
+<summary><b>Step 3 — Install and run the frontend</b></summary>
 
 Open a terminal in the frontend directory:
 
 ```bash
 cd frontend
 npm install
-```
-
-Start the frontend development server:
-
-```bash
 npm run dev
 ```
 
-Vite will display the local URL in your terminal, commonly:
+Open the local URL displayed by Vite in the terminal. It is commonly `http://localhost:5173`.
 
-```text
-http://localhost:5173
-```
+Keep the frontend terminal running.
 
-Keep this terminal running.
+</details>
 
-### 3. Install backend dependencies
+<details>
+<summary><b>Step 4 — Set up the backend</b></summary>
 
-Open a second terminal and navigate to the backend directory:
+Open a separate terminal in the backend directory:
 
 ```bash
 cd backend
 ```
 
-Create a Python virtual environment:
+Create a virtual environment.
 
-**Windows**
+**Windows:**
 
 ```bash
 python -m venv .venv
 .venv\Scripts\activate
 ```
 
-**Linux / macOS**
+**Linux or macOS:**
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-Install dependencies using the repository's dependency file:
+Install dependencies if the project contains `requirements.txt`:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-If the dependency file is located elsewhere, use its actual path. If the project uses `pyproject.toml` instead, follow its documented installation instructions.
+If the dependency file is located elsewhere, use the correct path.
 
-### 4. Configure environment variables
+</details>
 
-Create the appropriate `.env` file using the project's environment configuration example, if available.
+<details>
+<summary><b>Step 5 — Configure and start FastAPI</b></summary>
 
-Do not commit secrets to GitHub.
+Create the backend environment configuration using the variables required by your actual application.
 
-### 5. Start the backend
-
-Use the FastAPI application module defined in your repository. For example, if the application object is `app` inside `app/main.py`, run:
+For example, if the FastAPI instance is named `app` in `app/main.py`, start it with:
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
-The API will commonly be available at:
+The example local endpoints are:
 
-```text
-http://127.0.0.1:8000
-```
+| Service | URL |
+|---|---|
+| Frontend | `http://localhost:5173` |
+| Backend | `http://127.0.0.1:8000` |
+| Swagger API docs | `http://127.0.0.1:8000/docs` |
+| ReDoc | `http://127.0.0.1:8000/redoc` |
 
-FastAPI interactive API documentation is commonly available at:
+These are conventional defaults. Use the actual commands and ports configured in your repository.
 
-```text
-http://127.0.0.1:8000/docs
-```
-
-**Note:** Adjust the startup command to match the actual Python module and application object in your project.
+</details>
 
 ---
 
 ## 🔐 Environment Configuration
 
-Keep API keys and other secrets on the backend.
+Keep credentials on the backend and never commit secrets to GitHub.
 
-Example configuration:
+Example `.env` configuration:
 
 ```env
-# Application
 APP_ENV=development
-
-# Database
 DATABASE_URL=sqlite+aiosqlite:///./travellord.db
-
-# AI Assistant — optional
 GROQ_API_KEY=your_groq_api_key_here
 ```
 
-These are example values, not a guarantee that every variable name matches the current implementation. Check the backend configuration code before using them.
+These variable names are illustrative. Confirm the required names in the application's settings and database configuration before using them.
 
-### 🔒 Security checklist
+<details>
+<summary><b>🔒 Security checklist</b></summary>
 
-- Keep `.env` files out of version control.
-- Add `.env` and other secret files to `.gitignore`.
-- Never expose private API keys in frontend environment variables.
-- Validate and sanitize user-submitted data.
-- Enforce authorization on protected API endpoints.
-- Ensure users can access only data permitted by their account role.
-- Apply appropriate rate limits and error handling.
+- [ ] Add `.env` to `.gitignore`.
+- [ ] Keep private API keys on the server.
+- [ ] Never hardcode secrets into frontend code.
+- [ ] Validate incoming requests.
+- [ ] Enforce authentication and authorization on protected endpoints.
+- [ ] Restrict access to account-specific data.
+- [ ] Handle API failures without exposing sensitive details.
+- [ ] Protect private user information.
+- [ ] Review uploaded reports and their contents appropriately.
+
+</details>
 
 ---
 
-## 🔌 API Overview
+## 🔌 API Documentation
 
-The FastAPI backend provides the application programming interface for supported features.
-
-Depending on the implementation, API groups may include:
+TravelLord AI uses FastAPI for its backend API.
 
 | API area | Purpose |
 |---|---|
-| Authentication | Registration, login, and account management |
-| Journey planning | Route and journey-related requests |
-| Risk information | Access available hazard and incident data |
-| Community reports | Submit and retrieve reports |
-| Notifications | Retrieve relevant updates |
-| AI Assistant | Submit prompts for AI-assisted responses |
+| Authentication | Account and login operations |
+| Journey planning | Journey-related requests |
+| Risk information | Available hazard and incident data |
+| Community reports | Report submission and retrieval |
+| Notifications | User-related updates, where implemented |
+| AI Assistant | AI requests, where configured |
 | Administration | Authorized management operations |
 
-### Explore the API
+### Explore available endpoints
 
-Once the backend is running, visit:
+Once the backend is running, open:
 
-- **Swagger UI:** `http://127.0.0.1:8000/docs`
-- **ReDoc:** `http://127.0.0.1:8000/redoc`
+- [Swagger UI](http://127.0.0.1:8000/docs)
+- [ReDoc](http://127.0.0.1:8000/redoc)
 
-These are the standard FastAPI documentation routes unless the application configuration changes them.
+These links point to your local machine. They will work when the corresponding backend service is running.
 
-Use the interactive API documentation to inspect actual endpoints, request schemas, authentication requirements, and response formats.
+<details>
+<summary><b>📘 How to test an API</b></summary>
+
+1. Start the backend.
+2. Open Swagger UI.
+3. Expand an endpoint.
+4. Inspect the request schema.
+5. Supply the required parameters.
+6. Execute the request.
+7. Review the response and status code.
+
+Use the actual API documentation to identify implemented routes rather than assuming every listed API area has an endpoint.
+
+</details>
 
 ---
 
 ## 🗄️ Database
 
-TravelLord AI uses SQLite for local development in its current configuration.
+SQLite is used in the current local-development configuration.
 
-The database can store application data such as:
+Potentially persisted information includes:
 
-- User accounts and preferences.
-- Journey-related information.
-- Hazard and incident records.
-- Community reports.
-- Notifications and contributions.
+- User accounts and preferences
+- Journey information
+- Hazard and incident records
+- Community contributions
+- Notifications and related records
 
-The exact tables and relationships are determined by the implemented database models.
+The actual schema depends on the implemented database models.
 
-### Database considerations
+<details>
+<summary><b>🧰 Database best practices</b></summary>
 
-- Protect user credentials and personal information.
-- Use appropriate database constraints and validation.
-- Maintain backups for important data.
-- Separate test data from production data.
-- Consider PostgreSQL with PostGIS when production-scale geospatial querying is required.
+- Protect credentials and personal information.
+- Validate database inputs and enforce suitable constraints.
+- Back up important application data.
+- Keep test data separate from production records.
+- Ensure the database path is correct for the directory from which the backend starts.
+- Consider PostgreSQL with PostGIS for more advanced production geospatial workloads.
+
+</details>
 
 ---
 
 ## 🧪 Testing
 
-Test the application before deployment.
+**Test the application before deployment.** The commands below are examples and depend on the scripts and dependencies configured in the repository.
 
-### Frontend checks
+<details>
+<summary><b>🎨 Frontend checks</b></summary>
 
 ```bash
 cd frontend
 npm run build
 ```
 
-Run the repository's configured linting or test commands if available:
+If configured in `package.json`, also run:
 
 ```bash
 npm run lint
 npm run test
 ```
 
-These commands depend on the scripts defined in `package.json`.
+</details>
 
-### Backend checks
+<details>
+<summary><b>⚙️ Backend checks</b></summary>
 
-Activate the Python virtual environment, install dependencies, and run the configured test suite. For a project using pytest:
+Activate the Python virtual environment and install the project's dependencies.
+
+If the project uses pytest:
 
 ```bash
 pytest
 ```
 
-### Functional testing checklist
+</details>
 
-- [ ] Registration and login work correctly.
-- [ ] Protected pages are inaccessible to unauthorized users.
-- [ ] Journey planning handles valid and invalid inputs.
-- [ ] Maps display available routes correctly.
-- [ ] Risk information displays appropriate source and timestamp details.
-- [ ] Community reports are saved and retrieved correctly.
-- [ ] Report verification status is displayed accurately.
-- [ ] The AI Assistant handles unavailable data and API failures safely.
-- [ ] Navigation menus work with mouse, keyboard, and touch.
-- [ ] Pages remain usable on mobile and desktop screens.
-- [ ] Backend authorization prevents unauthorized data access.
-- [ ] Loading, empty, and error states are handled clearly.
+<details>
+<summary><b>✅ Functional verification checklist</b></summary>
 
-> The checklist describes recommended verification steps. It does not imply that every test has already passed.
+- [ ] Registration and login
+- [ ] Protected-page access control
+- [ ] Journey planning and route display
+- [ ] Risk information and timestamps
+- [ ] Community report submission
+- [ ] Report status and verification handling
+- [ ] AI Assistant error handling
+- [ ] API failure and empty-data handling
+- [ ] Responsive desktop and mobile layouts
+- [ ] Keyboard and touch navigation
+- [ ] User-data access restrictions
+- [ ] Environment variables and secret handling
 
----
+</details>
 
-## 🛡️ Safety, Privacy and Data Transparency
-
-TravelLord AI is intended to improve access to travel-related information, not replace official authorities or emergency services.
-
-### 📡 Source transparency
-
-Where possible, information should communicate:
-
-- Its source.
-- Its category and location.
-- Its reporting or update time.
-- Its verification status.
-- Any known limitations.
-
-### ⚠️ Different information types
-
-The application should distinguish between:
-
-- **Official alerts:** Information published by an identified authority.
-- **Community reports:** Information submitted by platform users.
-- **Sample or demonstration data:** Records included for development or testing.
-- **External service data:** Information returned by configured third-party services.
-
-Do not present sample records as live incidents or unverified reports as confirmed facts.
-
-### 🔐 Privacy
-
-The application should collect only the data necessary for its functionality, protect user information, and restrict account-specific information to authorized users.
-
-### 🚨 Emergency awareness
-
-For urgent situations, follow instructions from relevant authorities and contact the appropriate local emergency service. Do not rely exclusively on this platform for emergency decisions.
+> These are recommended tests, not claims that the project has already passed them.
 
 ---
 
-## 🚀 Future Enhancements
+## 📡 Data Transparency and Safety
 
-Potential future improvements include:
+TravelLord AI should distinguish between different information types so users can interpret the information responsibly.
 
-- 🌏 Broader geographic coverage across India.
-- 📍 More consistent location-based incident discovery.
-- 🔄 Improved official-source integration and freshness tracking.
-- 👥 Stronger community-report moderation and verification.
-- 🔔 More reliable, relevant notifications.
-- ♿ Improved accessibility and keyboard navigation.
-- 📱 Further mobile usability improvements.
-- 🧪 Expanded automated testing and integration monitoring.
-- 📊 Better source coverage and data-quality reporting.
-- 🔐 Additional production security and operational monitoring.
+<table>
+<tr>
+<th>Information type</th>
+<th>Meaning</th>
+</tr>
+<tr>
+<td>🏛️ Official alert</td>
+<td>Information attributed to an identified authority.</td>
+</tr>
+<tr>
+<td>👥 Community report</td>
+<td>Information submitted by a user; it may require verification.</td>
+</tr>
+<tr>
+<td>🧪 Sample data</td>
+<td>Demonstration or development records, not evidence of a current incident.</td>
+</tr>
+<tr>
+<td>🌐 External service data</td>
+<td>Information returned by a configured third-party service.</td>
+</tr>
+</table>
 
-These are possible enhancements and should not be interpreted as features already completed.
+Where possible, risk information should include its source, location, timestamp, verification status, and known limitations.
+
+**Emergency notice:** For urgent situations, follow instructions from the relevant authorities and contact the appropriate local emergency service. Do not rely exclusively on TravelLord AI for emergency decisions.
+
+---
+
+## 🚀 Roadmap
+
+Potential improvements for future versions:
+
+- [ ] 🌏 Broader coverage across major locations in India
+- [ ] 🔄 Improved source freshness and availability tracking
+- [ ] 👥 Better community-report review workflows
+- [ ] 🔔 More reliable and relevant notifications
+- [ ] 📱 Improved mobile experience and accessibility
+- [ ] 🧪 Expanded automated and integration testing
+- [ ] 🔐 Further security and production-readiness improvements
+- [ ] 📊 Improved visibility into source coverage and data quality
+
+These are proposed enhancements, not a representation of completed functionality.
 
 ---
 
 ## 🤝 Contributing
 
-Contributions that improve usability, reliability, accessibility, security, and source transparency are welcome.
-
-1. Fork the repository.
-2. Create a feature branch.
-3. Make focused changes.
-4. Test the affected functionality.
-5. Submit a pull request with a clear description.
-
-Example:
+Contributions that improve reliability, accessibility, usability, security, and data transparency are welcome.
 
 ```bash
 git checkout -b feature/your-feature-name
 git add .
-git commit -m "Improve travel risk awareness"
+git commit -m "Describe your changes"
 git push origin feature/your-feature-name
 ```
 
-Please avoid committing credentials, personal data, local database files containing private information, or unrelated generated files.
+Then open a pull request on GitHub with a description of your changes and the tests performed.
+
+Please do not commit credentials, private user information, or unrelated generated files.
 
 ---
 
 ## 📄 License
 
-Add the project's chosen open-source license to the repository before publishing it as an open-source project.
-
-Until a license is specified, the repository should not be assumed to grant unrestricted permission to reuse, modify, or redistribute its contents.
+Add a `LICENSE` file containing your chosen license before describing the project as open source. Until a license is specified, do not assume the repository grants unrestricted reuse or redistribution rights.
 
 ---
 
 <div align="center">
 
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:7C3AED,50:0F766E,100:0F172A&height=140&section=footer" width="100%" alt="Decorative footer"/>
+
 ### 🌍 Travel Smarter. Stay Informed. Travel Aware.
 
-**TravelLord AI — Making travel-risk information more accessible.**
+**TravelLord AI**
 
-<sub>Built as a technology project focused on traveller awareness, accessible information, and responsible AI assistance.</sub>
+<i>Making travel-risk information more accessible through technology and responsible AI assistance.</i>
+
+<br/>
+
+<a href="#-explore-travel-lord-ai">⬆ Back to top</a>
 
 </div>
